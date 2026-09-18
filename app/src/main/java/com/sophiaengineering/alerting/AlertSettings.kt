@@ -3,25 +3,47 @@ package com.sophiaengineering.alerting
 /**
  * Réglages immuables de l'application. Ne dépend d'aucune API Android :
  * la validation est testable en JVM pure.
+ *
+ * [recipients] peut contenir plusieurs adresses séparées par virgule,
+ * point-virgule ou retour à la ligne.
  */
 data class AlertSettings(
     val senderEmail: String,
     val appPassword: String,
-    val recipientEmail: String,
+    val recipients: String,
     val frequencyMinutes: Int,
     val smtpHost: String,
     val smtpPort: Int,
+    val lowBatteryAlertEnabled: Boolean,
+    val lowBatteryThreshold: Int,
     val monitoringEnabled: Boolean
 ) {
+    /** Liste des destinataires normalisée (adresses non vides). */
+    fun recipientList(): List<String> =
+        recipients.split(',', ';', '\n')
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+
     /** Liste des erreurs de validation (vide si les réglages sont valides). */
     fun validationErrors(): List<String> {
         val errors = mutableListOf<String>()
         if (!isValidEmail(senderEmail)) errors.add("Email d'envoi invalide")
         if (appPassword.isBlank()) errors.add("Mot de passe d'application manquant")
-        if (!isValidEmail(recipientEmail)) errors.add("Email destinataire invalide")
+
+        val recips = recipientList()
+        if (recips.isEmpty()) {
+            errors.add("Au moins un destinataire est requis")
+        } else {
+            recips.filterNot { isValidEmail(it) }
+                .forEach { errors.add("Destinataire invalide : $it") }
+        }
+
         if (frequencyMinutes < 1) errors.add("La fréquence doit être ≥ 1 minute")
         if (smtpHost.isBlank()) errors.add("Serveur SMTP manquant")
         if (smtpPort !in 1..65535) errors.add("Port SMTP invalide (1-65535)")
+        if (lowBatteryAlertEnabled && lowBatteryThreshold !in 1..100) {
+            errors.add("Le seuil de batterie doit être entre 1 et 100 %")
+        }
         return errors
     }
 

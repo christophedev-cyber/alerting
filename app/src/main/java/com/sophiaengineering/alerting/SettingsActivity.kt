@@ -8,7 +8,11 @@ import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.sophiaengineering.alerting.databinding.ActivitySettingsBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -26,6 +30,7 @@ class SettingsActivity : AppCompatActivity() {
         store = SettingsStore(this)
         loadIntoUi(store.load())
 
+        binding.testButton.setOnClickListener { onTestClicked() }
         binding.startButton.setOnClickListener { onStartClicked() }
         binding.stopButton.setOnClickListener { onStopClicked() }
 
@@ -35,8 +40,10 @@ class SettingsActivity : AppCompatActivity() {
     private fun loadIntoUi(s: AlertSettings) {
         binding.senderEmail.setText(s.senderEmail)
         binding.appPassword.setText(s.appPassword)
-        binding.recipientEmail.setText(s.recipientEmail)
+        binding.recipients.setText(s.recipients)
         binding.frequency.setText(s.frequencyMinutes.toString())
+        binding.lowBatterySwitch.isChecked = s.lowBatteryAlertEnabled
+        binding.lowBatteryThreshold.setText(s.lowBatteryThreshold.toString())
         binding.smtpHost.setText(s.smtpHost)
         binding.smtpPort.setText(s.smtpPort.toString())
         binding.statusText.text = if (s.monitoringEnabled) {
@@ -49,10 +56,12 @@ class SettingsActivity : AppCompatActivity() {
     private fun readFromUi(): AlertSettings = AlertSettings(
         senderEmail = binding.senderEmail.text.toString(),
         appPassword = binding.appPassword.text.toString(),
-        recipientEmail = binding.recipientEmail.text.toString(),
+        recipients = binding.recipients.text.toString(),
         frequencyMinutes = binding.frequency.text.toString().toIntOrNull() ?: 0,
         smtpHost = binding.smtpHost.text.toString().ifBlank { SettingsStore.DEFAULT_HOST },
         smtpPort = binding.smtpPort.text.toString().toIntOrNull() ?: 0,
+        lowBatteryAlertEnabled = binding.lowBatterySwitch.isChecked,
+        lowBatteryThreshold = binding.lowBatteryThreshold.text.toString().toIntOrNull() ?: 0,
         monitoringEnabled = true
     )
 
@@ -60,7 +69,7 @@ class SettingsActivity : AppCompatActivity() {
         val settings = readFromUi()
         val errors = settings.validationErrors()
         if (errors.isNotEmpty()) {
-            binding.statusText.text = "Erreurs :\n- " + errors.joinToString("\n- ")
+            showErrors(errors)
             return
         }
         store.save(settings)
@@ -75,6 +84,44 @@ class SettingsActivity : AppCompatActivity() {
         store.setMonitoringEnabled(false)
         stopService(Intent(this, MonitoringService::class.java))
         binding.statusText.text = "Statut : arrêtée"
+    }
+
+    /** Envoie un email de test avec les valeurs actuellement saisies. */
+    private fun onTestClicked() {
+        val settings = readFromUi()
+        val errors = settings.validationErrors()
+        if (errors.isNotEmpty()) {
+            showErrors(errors)
+            return
+        }
+        binding.testButton.isEnabled = false
+        binding.statusText.text = "Envoi du test en cours…"
+        lifecycleScope.launch {
+            val error = withContext(Dispatchers.IO) {
+                try {
+                    SmtpEmailSender().send(
+                        settings,
+                        EmailMessage(
+                            subject = "[TEST] Alerting",
+                            body = "Ceci est un email de test envoyé depuis l'application Alerting."
+                        )
+                    )
+                    null
+                } catch (e: Exception) {
+                    e.message ?: "erreur inconnue"
+                }
+            }
+            binding.testButton.isEnabled = true
+            binding.statusText.text = if (error == null) {
+                "Test envoyé avec succès ✓"
+            } else {
+                "Échec du test : $error"
+            }
+        }
+    }
+
+    private fun showErrors(errors: List<String>) {
+        binding.statusText.text = "Erreurs :\n- " + errors.joinToString("\n- ")
     }
 
     private fun maybeRequestNotificationPermission() {

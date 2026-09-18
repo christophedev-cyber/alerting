@@ -10,10 +10,12 @@ class AlertSettingsTest {
     private fun valid() = AlertSettings(
         senderEmail = "envoi@gmail.com",
         appPassword = "abcd efgh ijkl mnop",
-        recipientEmail = "dest@exemple.com",
+        recipients = "dest@exemple.com",
         frequencyMinutes = 15,
         smtpHost = "smtp.gmail.com",
         smtpPort = 587,
+        lowBatteryAlertEnabled = false,
+        lowBatteryThreshold = 20,
         monitoringEnabled = true
     )
 
@@ -26,11 +28,6 @@ class AlertSettingsTest {
     @Test
     fun `email envoi invalide est rejete`() {
         assertFalse(valid().copy(senderEmail = "pas-un-email").isValid())
-    }
-
-    @Test
-    fun `email destinataire invalide est rejete`() {
-        assertFalse(valid().copy(recipientEmail = "dest@").isValid())
     }
 
     @Test
@@ -54,11 +51,51 @@ class AlertSettingsTest {
         assertFalse(valid().copy(smtpHost = "").isValid())
     }
 
+    // --- Destinataires multiples ---------------------------------------
+
     @Test
-    fun `plusieurs erreurs sont toutes remontees`() {
-        val s = AlertSettings("", "", "", 0, "", 0, false)
-        assertEquals(6, s.validationErrors().size)
+    fun `aucun destinataire est rejete`() {
+        assertFalse(valid().copy(recipients = "   ").isValid())
     }
+
+    @Test
+    fun `plusieurs destinataires valides sont acceptes`() {
+        val s = valid().copy(recipients = "a@x.com, b@y.com; c@z.com")
+        assertTrue(s.isValid())
+        assertEquals(listOf("a@x.com", "b@y.com", "c@z.com"), s.recipientList())
+    }
+
+    @Test
+    fun `destinataires separes par retour a la ligne`() {
+        val s = valid().copy(recipients = "a@x.com\nb@y.com\n")
+        assertEquals(listOf("a@x.com", "b@y.com"), s.recipientList())
+    }
+
+    @Test
+    fun `un destinataire invalide dans la liste est rejete`() {
+        assertFalse(valid().copy(recipients = "ok@x.com, pas-bon").isValid())
+    }
+
+    // --- Seuil batterie faible -----------------------------------------
+
+    @Test
+    fun `seuil ignore si alerte batterie desactivee`() {
+        // seuil hors plage mais toggle off -> valide
+        assertTrue(valid().copy(lowBatteryAlertEnabled = false, lowBatteryThreshold = 0).isValid())
+    }
+
+    @Test
+    fun `seuil hors plage rejete si alerte batterie activee`() {
+        assertFalse(valid().copy(lowBatteryAlertEnabled = true, lowBatteryThreshold = 0).isValid())
+        assertFalse(valid().copy(lowBatteryAlertEnabled = true, lowBatteryThreshold = 101).isValid())
+    }
+
+    @Test
+    fun `seuil valide accepte si alerte batterie activee`() {
+        assertTrue(valid().copy(lowBatteryAlertEnabled = true, lowBatteryThreshold = 15).isValid())
+    }
+
+    // --- Validation email ----------------------------------------------
 
     @Test
     fun `validation email accepte les cas classiques`() {

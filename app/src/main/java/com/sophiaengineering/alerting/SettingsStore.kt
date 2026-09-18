@@ -28,10 +28,12 @@ class SettingsStore(context: Context) {
     fun load(): AlertSettings = AlertSettings(
         senderEmail = prefs.getString(KEY_SENDER, "").orEmpty(),
         appPassword = prefs.getString(KEY_PASSWORD, "").orEmpty(),
-        recipientEmail = prefs.getString(KEY_RECIPIENT, "").orEmpty(),
+        recipients = prefs.getString(KEY_RECIPIENTS, "").orEmpty(),
         frequencyMinutes = prefs.getInt(KEY_FREQUENCY, DEFAULT_FREQUENCY),
         smtpHost = prefs.getString(KEY_SMTP_HOST, DEFAULT_HOST).orEmpty().ifBlank { DEFAULT_HOST },
         smtpPort = prefs.getInt(KEY_SMTP_PORT, DEFAULT_PORT),
+        lowBatteryAlertEnabled = prefs.getBoolean(KEY_LOW_BAT_ENABLED, false),
+        lowBatteryThreshold = prefs.getInt(KEY_LOW_BAT_THRESHOLD, DEFAULT_THRESHOLD),
         monitoringEnabled = prefs.getBoolean(KEY_ENABLED, false)
     )
 
@@ -39,10 +41,12 @@ class SettingsStore(context: Context) {
         prefs.edit()
             .putString(KEY_SENDER, settings.senderEmail.trim())
             .putString(KEY_PASSWORD, settings.appPassword.trim())
-            .putString(KEY_RECIPIENT, settings.recipientEmail.trim())
+            .putString(KEY_RECIPIENTS, settings.recipients.trim())
             .putInt(KEY_FREQUENCY, settings.frequencyMinutes)
             .putString(KEY_SMTP_HOST, settings.smtpHost.trim())
             .putInt(KEY_SMTP_PORT, settings.smtpPort)
+            .putBoolean(KEY_LOW_BAT_ENABLED, settings.lowBatteryAlertEnabled)
+            .putInt(KEY_LOW_BAT_THRESHOLD, settings.lowBatteryThreshold)
             .putBoolean(KEY_ENABLED, settings.monitoringEnabled)
             .apply()
     }
@@ -55,14 +59,17 @@ class SettingsStore(context: Context) {
         private const val PREFS_NAME = "alerting_settings"
         private const val KEY_SENDER = "sender_email"
         private const val KEY_PASSWORD = "app_password"
-        private const val KEY_RECIPIENT = "recipient_email"
+        private const val KEY_RECIPIENTS = "recipients"
         private const val KEY_FREQUENCY = "frequency_minutes"
         private const val KEY_SMTP_HOST = "smtp_host"
         private const val KEY_SMTP_PORT = "smtp_port"
+        private const val KEY_LOW_BAT_ENABLED = "low_battery_enabled"
+        private const val KEY_LOW_BAT_THRESHOLD = "low_battery_threshold"
         private const val KEY_ENABLED = "monitoring_enabled"
 
         const val DEFAULT_FREQUENCY = 15
         const val DEFAULT_HOST = "smtp.gmail.com"
         const val DEFAULT_PORT = 587
+        const val DEFAULT_THRESHOLD = 20
     }
 }

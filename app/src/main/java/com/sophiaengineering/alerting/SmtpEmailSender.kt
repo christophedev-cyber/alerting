@@ -34,9 +34,13 @@ class SmtpEmailSender : EmailSender {
                 PasswordAuthentication(settings.senderEmail, settings.appPassword)
         })
 
+        val recipients = settings.recipientList()
+            .map { InternetAddress(it) }
+            .toTypedArray()
+
         val mime = MimeMessage(session).apply {
             setFrom(InternetAddress(settings.senderEmail))
-            setRecipient(Message.RecipientType.TO, InternetAddress(settings.recipientEmail))
+            setRecipients(Message.RecipientType.TO, recipients)
             subject = message.subject
             setText(message.body, "UTF-8")
         }

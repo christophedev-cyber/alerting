@@ -42,6 +42,22 @@ class MonitoringService : Service() {
 
     private lateinit var powerReceiver: PowerConnectionReceiver
 
+    /** Vrai si l'alerte batterie faible a déjà été envoyée pour la décharge en cours. */
+    private var lowBatteryAlerted = false
+
+    private val batteryReceiver = object : android.content.BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+            val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+            val status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
+            if (level < 0 || scale <= 0) return
+            val pct = level * 100 / scale
+            val charging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                status == BatteryManager.BATTERY_STATUS_FULL
+            handleBatteryChanged(pct, charging)
+        }
+    }
+
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onCreate() {
@@ -64,6 +80,15 @@ class MonitoringService : Service() {
             ContextCompat.RECEIVER_NOT_EXPORTED
         )
 
+        // Surveillance du niveau de batterie (broadcast sticky : renvoie
+        // immédiatement l'état courant à l'enregistrement).
+        ContextCompat.registerReceiver(
+            this,
+            batteryReceiver,
+            IntentFilter(Intent.ACTION_BATTERY_CHANGED),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
+
         // Initialise l'état courant. Si le téléphone est déjà sur batterie au
         // démarrage du service, cela déclenche immédiatement les alertes.
         handlePowerEvent(currentPowerState())
@@ -78,6 +103,11 @@ class MonitoringService : Service() {
         stopBatteryAlertLoop()
         try {
             unregisterReceiver(powerReceiver)
+        } catch (_: IllegalArgumentException) {
+            // déjà désenregistré
+        }
+        try {
+            unregisterReceiver(batteryReceiver)
         } catch (_: IllegalArgumentException) {
             // déjà désenregistré
         }
@@ -103,6 +133,28 @@ class MonitoringService : Service() {
                 }
                 updateNotification(label)
             }
+        }
+    }
+
+    /**
+     * Alerte batterie faible : envoi unique au franchissement du seuil, uniquement
+     * lorsque le téléphone est sur batterie (pas en charge).
+     */
+    private fun handleBatteryChanged(pct: Int, charging: Boolean) {
+        val settings = settingsStore.load()
+        if (!settings.lowBatteryAlertEnabled) return
+
+        if (charging) {
+            lowBatteryAlerted = false
+            return
+        }
+        if (pct <= settings.lowBatteryThreshold) {
+            if (!lowBatteryAlerted) {
+                lowBatteryAlerted = true
+                sendEmailAsync(buildLowBatteryMessage(pct))
+            }
+        } else {
+            lowBatteryAlerted = false
         }
     }
 
@@ -155,6 +207,17 @@ class MonitoringService : Service() {
             appendLine("Cet email sera renvoyé toutes les " +
                 "${settingsStore.load().frequencyMinutes} minute(s) tant que le " +
                 "téléphone reste sur batterie.")
+        }
+    )
+
+    private fun buildLowBatteryMessage(pct: Int): EmailMessage = EmailMessage(
+        subject = "[BATTERIE FAIBLE] ${deviceName()} — $pct%",
+        body = buildString {
+            appendLine("Le niveau de batterie est descendu sous le seuil configuré.")
+            appendLine()
+            appendLine("Appareil     : ${deviceName()}")
+            appendLine("Batterie     : $pct%")
+            appendLine("Horodatage   : ${now()}")
         }
     )
 

@@ -48,15 +48,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="8dp"
-            android:text="@string/label_recipient" />
+            android:text="@string/label_recipients" />
 
         <EditText
-            android:id="@+id/recipientEmail"
+            android:id="@+id/recipients"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/hint_recipient"
-            android:inputType="textEmailAddress"
-            android:autofillHints="emailAddress" />
+            android:hint="@string/hint_recipients"
+            android:inputType="textEmailAddress|textMultiLine"
+            android:minLines="2"
+            android:gravity="top" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -70,6 +71,40 @@
             android:layout_height="wrap_content"
             android:hint="@string/hint_frequency"
             android:inputType="number" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="4dp"
+            android:background="?android:attr/listDivider" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/lowBatterySwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:text="@string/label_low_battery_switch" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:text="@string/label_low_battery_threshold" />
+
+        <EditText
+            android:id="@+id/lowBatteryThreshold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_low_battery_threshold"
+            android:inputType="number" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="4dp"
+            android:background="?android:attr/listDivider" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -95,11 +130,18 @@
             android:layout_height="wrap_content"
             android:inputType="number" />
 
+        <Button
+            android:id="@+id/testButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/action_test" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingTop="16dp">
+            android:paddingTop="8dp">
 
             <Button
                 android:id="@+id/startButton"

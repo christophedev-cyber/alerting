@@ -106,9 +106,21 @@ manuel.
 - **APK debug non signé** : adapté à un usage personnel (installation directe),
   non distribuable sur le Play Store en l'état.
 
+## Révision 1.1 (ajouts validés le 2026-09-18)
+
+- **Destinataires multiples** : le champ destinataire accepte plusieurs adresses
+  séparées par virgule, point-virgule ou retour à la ligne (`AlertSettings.recipientList()`).
+- **Alerte batterie faible** (toggle on/off + seuil %) : envoi **unique au
+  franchissement** du seuil, **uniquement sur batterie** (pas en charge). Géré via
+  un receiver `ACTION_BATTERY_CHANGED` enregistré au runtime dans le service, avec
+  un drapeau anti-répétition réinitialisé quand la batterie remonte au-dessus du
+  seuil ou repasse en charge.
+- **Bouton « Tester l'envoi maintenant »** : envoie un email de test avec les
+  valeurs saisies (via `lifecycleScope` + `Dispatchers.IO`) et affiche le résultat.
+- **README traduit en anglais** + maquettes SVG de l'app dans `docs/images/`.
+
 ## Hors périmètre (YAGNI)
 
 - OAuth2 Google.
 - Distribution Play Store / signature release.
-- Configuration multi-destinataires.
 - Historique / journal des alertes dans l'UI.

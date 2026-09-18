@@ -1,101 +1,117 @@
-# Alerting — alerte email sur perte d'alimentation 220V
+# Alerting — email alert on mains power (220V) loss
 
-Application Android qui surveille l'alimentation secteur du téléphone. Dès que le
-téléphone est débranché du secteur (passage sur batterie), elle envoie un email
-d'alerte, puis le renvoie **toutes les N minutes** tant que le téléphone reste sur
-batterie. Un email est aussi envoyé quand le secteur est rétabli.
+Android app that monitors the phone's mains power. As soon as the phone is
+unplugged from the wall (switches to battery), it sends an alert email, then
+**resends it every N minutes** while the phone stays on battery. An email is also
+sent when mains power is restored, and — optionally — when the battery drops below
+a configurable threshold.
 
-L'envoi se fait via un compte Gmail (SMTP), avec un **mot de passe d'application**.
+Emails are sent through a Gmail account (SMTP) using a **Google app password**.
 
-## Fonctionnalités
+## Screenshots
 
-- Email immédiat au débranchement du secteur.
-- Renvoi périodique toutes les N minutes (N configurable, ≥ 1).
-- Email de rétablissement quand le secteur revient.
-- Redémarrage automatique de la surveillance après un reboot du téléphone.
-- Tous les paramètres réglables dans l'app (email d'envoi, mot de passe, email
-  destinataire, fréquence, serveur/port SMTP).
-- Mot de passe stocké chiffré (EncryptedSharedPreferences).
+> These are high-fidelity **design mockups** of the app (the layout matches the
+> actual UI), not device screenshots.
 
-## 1. Prérequis Google (mot de passe d'application)
+| Settings screen | Notification & alert emails |
+|---|---|
+| ![Settings screen](docs/images/settings-screen.svg) | ![Notification and emails](docs/images/alert-notification.svg) |
 
-Google n'autorise plus l'envoi SMTP avec le mot de passe normal du compte.
+## Features
 
-1. Activez la **validation en 2 étapes** sur le compte Gmail d'envoi :
+- Immediate email when mains power is lost.
+- Periodic resend every N minutes (N configurable, ≥ 1).
+- Restored-power email when mains comes back.
+- **Multiple recipients** (comma / semicolon / newline separated).
+- **Low-battery alert** with an on/off toggle and a configurable threshold —
+  sent once when the battery crosses below the threshold, only while on battery.
+- **"Test send now"** button to verify the settings immediately.
+- Automatic restart of monitoring after a phone reboot.
+- All parameters editable in the app (sender email, app password, recipients,
+  frequency, low-battery threshold, SMTP host/port).
+- App password stored encrypted (EncryptedSharedPreferences).
+
+## 1. Google prerequisite (app password)
+
+Google no longer allows SMTP sending with your normal account password.
+
+1. Enable **2-Step Verification** on the sending Gmail account:
    https://myaccount.google.com/security
-2. Générez un **mot de passe d'application** :
+2. Generate an **app password**:
    https://myaccount.google.com/apppasswords
-3. Copiez les 16 caractères générés : c'est ce que vous saisirez dans l'app
-   (champ « Mot de passe d'application »).
+3. Copy the 16-character value — that is what you enter in the app
+   ("Google app password" field).
 
-## 2. Compiler l'APK (build cloud, sans rien installer)
+## 2. Build the APK (cloud build, nothing to install)
 
-Le projet compile automatiquement via **GitHub Actions**.
+The project builds automatically via **GitHub Actions**.
 
-1. Créez un dépôt GitHub et poussez ce projet :
+1. Push the project to a GitHub repository:
    ```bash
-   git remote add origin https://github.com/<vous>/Alerting.git
+   git remote add origin https://github.com/<you>/alerting.git
    git push -u origin main
    ```
-2. Ouvrez l'onglet **Actions** du dépôt. Le workflow « Build APK » se lance à
-   chaque push (et manuellement via « Run workflow »).
-3. À la fin, téléchargez l'artefact **`alerting-debug-apk`** : il contient
+2. Open the repository's **Actions** tab. The "Build APK" workflow runs on every
+   push (and manually via "Run workflow").
+3. When it finishes, download the **`alerting-debug-apk`** artifact — it contains
    `app-debug.apk`.
 
-## 3. Installer sur le téléphone
+## 3. Install on the phone
 
-1. Transférez `app-debug.apk` sur le téléphone.
-2. Autorisez l'installation depuis des sources inconnues, puis installez l'APK.
-3. Ouvrez l'app, remplissez les champs, appuyez sur **Démarrer**.
-4. Acceptez la demande d'autorisation de **notifications** (Android 13+).
+1. Transfer `app-debug.apk` to the phone.
+2. Allow installation from unknown sources, then install the APK.
+3. Open the app, fill in the fields, tap **Start**.
+4. Accept the **notifications** permission prompt (Android 13+).
 
-## 4. Fiabilité en arrière-plan (IMPORTANT)
+## 4. Background reliability (IMPORTANT)
 
-Certains constructeurs (Samsung, Xiaomi, Huawei, Oppo…) coupent agressivement les
-services en arrière-plan. Pour garantir l'envoi des alertes :
+Some manufacturers (Samsung, Xiaomi, Huawei, Oppo…) aggressively kill background
+services. To make sure alerts are sent:
 
-- Réglages → Applications → **Alerting** → Batterie → **Non restreinte / Autoriser
-  l'activité en arrière-plan**.
-- Désactivez l'optimisation de batterie pour cette app.
+- Settings → Apps → **Alerting** → Battery → **Unrestricted / Allow background
+  activity**.
+- Disable battery optimization for this app.
 
-Sans cela, le système peut tuer le service et les emails ne partiront pas.
+Without this, the system may kill the service and no emails will be sent.
 
-## 5. Comment ça marche
+## 5. How it works
 
-| Événement | Action |
+| Event | Action |
 |---|---|
-| Débranchement du secteur | Email immédiat + renvoi toutes les N min |
-| Sur batterie | Un email toutes les N minutes |
-| Rebranchement du secteur | Email de rétablissement, arrêt des renvois |
-| Redémarrage du téléphone | La surveillance reprend si elle était active |
+| Mains power unplugged | Immediate email + resend every N min |
+| On battery | One email every N minutes |
+| Battery drops below threshold (if enabled) | One low-battery email (once per crossing) |
+| Mains power restored | Restored-power email, resends stop |
+| Phone reboot | Monitoring resumes if it was active |
 
-> Remarque : la détection repose sur la connexion/déconnexion de l'alimentation
-> (secteur ou USB). Un chargeur 220V correspond bien au cas « alimenté ».
+> Note: detection is based on power connect/disconnect (mains or USB). A 220V wall
+> charger maps to the "powered" state.
 
-## 6. Développement / tests
+## 6. Development / tests
 
-Logique métier testée en JVM pure (aucun device requis) :
+Business logic is tested on the pure JVM (no device required):
 
 ```bash
 gradle testDebugUnitTest
 ```
 
-- `AlertStateMachine` : transitions secteur ↔ batterie.
-- `AlertSettings` : validation des paramètres.
+- `AlertStateMachine` — mains ↔ battery transitions.
+- `AlertSettings` — parameter validation, multi-recipient parsing, low-battery
+  threshold rules.
 
-## Structure
+## Project structure
 
 ```
 app/src/main/java/com/sophiaengineering/alerting/
-  AlertSettings.kt         # data class + validation (pur)
-  AlertStateMachine.kt     # logique de transition (pur)
+  AlertSettings.kt         # data class + validation + recipient parsing (pure)
+  AlertStateMachine.kt     # transition logic (pure)
   EmailSender.kt           # interface
-  SmtpEmailSender.kt       # envoi SMTP (JavaMail)
-  SettingsStore.kt         # persistance chiffrée
-  MonitoringService.kt     # foreground service + boucle timer
+  SmtpEmailSender.kt       # SMTP sending (JavaMail), multi-recipient
+  SettingsStore.kt         # encrypted persistence
+  MonitoringService.kt     # foreground service + timer loop + battery watch
   PowerConnectionReceiver.kt
   BootReceiver.kt
-  SettingsActivity.kt      # UI de réglages
+  SettingsActivity.kt      # settings UI + test-send button
 ```
 
-Spec de conception : `docs/superpowers/specs/2026-09-18-alerting-power-email-design.md`
+Design spec (French): `docs/superpowers/specs/2026-09-18-alerting-power-email-design.md`
