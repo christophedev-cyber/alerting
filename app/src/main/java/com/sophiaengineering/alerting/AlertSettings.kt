@@ -16,6 +16,9 @@ data class AlertSettings(
     val smtpPort: Int,
     val lowBatteryAlertEnabled: Boolean,
     val lowBatteryThreshold: Int,
+    val smsAlertEnabled: Boolean,
+    val phoneCountryIso: String,
+    val phoneNumber: String,
     val monitoringEnabled: Boolean
 ) {
     /** Liste des destinataires normalisée (adresses non vides). */
@@ -43,6 +46,9 @@ data class AlertSettings(
         if (smtpPort !in 1..65535) errors.add("Invalid SMTP port (1-65535)")
         if (lowBatteryAlertEnabled && lowBatteryThreshold !in 1..100) {
             errors.add("Battery threshold must be between 1 and 100%")
+        }
+        if (smsAlertEnabled && phoneNumber.isBlank()) {
+            errors.add("SMS enabled but phone number is empty")
         }
         return errors
     }

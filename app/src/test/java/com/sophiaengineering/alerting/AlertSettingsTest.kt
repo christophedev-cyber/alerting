@@ -16,6 +16,9 @@ class AlertSettingsTest {
         smtpPort = 587,
         lowBatteryAlertEnabled = false,
         lowBatteryThreshold = 20,
+        smsAlertEnabled = false,
+        phoneCountryIso = "FR",
+        phoneNumber = "",
         monitoringEnabled = true
     )
 
@@ -93,6 +96,25 @@ class AlertSettingsTest {
     @Test
     fun `seuil valide accepte si alerte batterie activee`() {
         assertTrue(valid().copy(lowBatteryAlertEnabled = true, lowBatteryThreshold = 15).isValid())
+    }
+
+    // --- Alerte SMS ----------------------------------------------------
+
+    @Test
+    fun `sms active sans numero est rejete`() {
+        assertFalse(valid().copy(smsAlertEnabled = true, phoneNumber = "  ").isValid())
+    }
+
+    @Test
+    fun `sms active avec numero renseigne passe la validation de base`() {
+        // La validation de format (libphonenumber) est faite au niveau UI ;
+        // ici on vérifie seulement la règle "numéro non vide".
+        assertTrue(valid().copy(smsAlertEnabled = true, phoneNumber = "612345678").isValid())
+    }
+
+    @Test
+    fun `sms desactive ignore le numero`() {
+        assertTrue(valid().copy(smsAlertEnabled = false, phoneNumber = "").isValid())
     }
 
     // --- Validation email ----------------------------------------------

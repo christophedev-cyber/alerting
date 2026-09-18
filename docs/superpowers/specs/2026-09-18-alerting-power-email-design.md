@@ -119,8 +119,21 @@ manuel.
   valeurs saisies (via `lifecycleScope` + `Dispatchers.IO`) et affiche le résultat.
 - **README traduit en anglais** + maquettes SVG de l'app dans `docs/images/`.
 
+## Révision 1.2+ (ajouts ultérieurs)
+
+- **Signature stable + Releases par tag** : APK signé release avec clé committée,
+  `versionCode`/`versionName` injectés par la CI, Release GitHub publiée sur tag `v*`.
+- **Vérificateur de mise à jour intégré** : `UpdateChecker` (dernière Release) +
+  `VersionCompare` (pur) → dialogue « Update available » au lancement.
+- **Installation en un geste** : `ApkInstaller` télécharge l'APK et lance
+  l'installeur système (`REQUEST_INSTALL_PACKAGES` + FileProvider).
+- **UI** : titre « Alerting \<version\> », boutons fixes en bas, champs défilants.
+- **Alerte SMS** (toggle) : SMS envoyé **une fois** par événement (perte secteur,
+  rétablissement, batterie faible) via `SmsSender` (`SEND_SMS`). Sélecteur de tous
+  les pays (drapeau + indicatif auto) et validation du numéro par pays via
+  `PhoneValidator`/`Countries` (libphonenumber). Email reste le canal périodique.
+
 ## Hors périmètre (YAGNI)
 
 - OAuth2 Google.
-- Distribution Play Store / signature release.
 - Historique / journal des alertes dans l'UI.

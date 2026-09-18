@@ -19,6 +19,11 @@
     <string name="label_low_battery_threshold">Low-battery threshold (%)</string>
     <string name="hint_low_battery_threshold">20</string>
 
+    <string name="label_sms_switch">Also send SMS alerts</string>
+    <string name="label_country">Country</string>
+    <string name="label_phone">Phone number</string>
+    <string name="hint_phone">6 12 34 56 78</string>
+
     <string name="label_smtp_host">SMTP server</string>
     <string name="label_smtp_port">SMTP port</string>
 

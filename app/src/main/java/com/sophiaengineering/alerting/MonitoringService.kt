@@ -1,5 +1,6 @@
 package com.sophiaengineering.alerting
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -7,6 +8,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.os.BatteryManager
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
@@ -119,10 +121,16 @@ class MonitoringService : Service() {
 
     private fun handlePowerEvent(newState: PowerState) {
         when (stateMachine.onPowerEvent(newState)) {
-            is AlertAction.StartBatteryAlerts -> startBatteryAlertLoop()
+            is AlertAction.StartBatteryAlerts -> {
+                startBatteryAlertLoop()
+                sendSmsIfEnabled(
+                    "[ALERT] ${deviceName()} on battery (${batteryLevel()}%) at ${now()}"
+                )
+            }
             is AlertAction.StopAndNotifyRestored -> {
                 stopBatteryAlertLoop()
                 sendEmailAsync(buildRestoredMessage())
+                sendSmsIfEnabled("[OK] ${deviceName()} mains power restored at ${now()}")
                 updateNotification("On mains power — monitoring active")
             }
             is AlertAction.None -> {
@@ -152,6 +160,7 @@ class MonitoringService : Service() {
             if (!lowBatteryAlerted) {
                 lowBatteryAlerted = true
                 sendEmailAsync(buildLowBatteryMessage(pct))
+                sendSmsIfEnabled("[LOW BATTERY] ${deviceName()} $pct% at ${now()}")
             }
         } else {
             lowBatteryAlerted = false
@@ -177,6 +186,31 @@ class MonitoringService : Service() {
 
     private fun sendEmailAsync(message: EmailMessage) {
         serviceScope.launch { sendEmail(message) }
+    }
+
+    /** Envoie un SMS d'alerte si l'option est activée, le numéro valide et la permission accordée. */
+    private fun sendSmsIfEnabled(text: String) {
+        val settings = settingsStore.load()
+        if (!settings.smsAlertEnabled) return
+
+        val destination = PhoneValidator.toE164(settings.phoneCountryIso, settings.phoneNumber)
+        if (destination == null) {
+            updateNotification("SMS not sent: invalid phone number")
+            return
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            updateNotification("SMS not sent: SMS permission missing")
+            return
+        }
+        serviceScope.launch(Dispatchers.IO) {
+            try {
+                SmsSender.send(this@MonitoringService, destination, text)
+            } catch (e: Exception) {
+                updateNotification("SMS failed: ${e.message ?: "unknown error"}")
+            }
+        }
     }
 
     private suspend fun sendEmail(message: EmailMessage) {

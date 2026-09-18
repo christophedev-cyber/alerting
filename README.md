@@ -25,6 +25,11 @@ Emails are sent through a Gmail account (SMTP) using a **Google app password**.
 - **Multiple recipients** (comma / semicolon / newline separated).
 - **Low-battery alert** with an on/off toggle and a configurable threshold —
   sent once when the battery crosses below the threshold, only while on battery.
+- **SMS alerts** (optional toggle): sends a text message to a configured number on
+  the key events (power lost, power restored, low battery). Country picker with
+  flags and auto-filled dial code; the number is validated per country
+  (libphonenumber). SMS is sent **once per event** (not every N minutes) to limit
+  cost — email remains the periodic channel.
 - **"Test send now"** button to verify the settings immediately.
 - Automatic restart of monitoring after a phone reboot.
 - All parameters editable in the app (sender email, app password, recipients,
@@ -132,6 +137,11 @@ Without this, the system may kill the service and no emails will be sent.
 | Battery drops below threshold (if enabled) | One low-battery email (once per crossing) |
 | Mains power restored | Restored-power email, resends stop |
 | Phone reboot | Monitoring resumes if it was active |
+
+If **SMS alerts** are enabled, a text message is also sent on power-lost,
+power-restored and low-battery (once each). SMS uses the monitored phone's SIM and
+consumes its SMS allowance, and requires the `SEND_SMS` permission (requested when
+you enable the toggle).
 
 > Note: detection is based on power connect/disconnect (mains or USB). A 220V wall
 > charger maps to the "powered" state.
