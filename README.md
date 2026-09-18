@@ -32,6 +32,8 @@ Emails are sent through a Gmail account (SMTP) using a **Google app password**.
   test SMS to each configured number.
 - Automatic restart of monitoring after a phone reboot.
 - Live status in the header: **Active** (green) / **Stopped** (red).
+- **Read-only lock**: settings open locked; tap the lock icon in the header to edit,
+  preventing accidental changes.
 - All parameters editable in the app (sender email, app password, recipients,
   low-battery threshold, phone number, SMTP host/port).
 - App password stored encrypted (EncryptedSharedPreferences).

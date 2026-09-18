@@ -31,6 +31,16 @@
             android:textSize="16sp"
             android:textStyle="bold"
             android:text="Stopped" />
+
+        <ImageButton
+            android:id="@+id/lockButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="12dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_lock"
+            android:tint="#FFFFFF"
+            android:contentDescription="Lock or unlock editing" />
     </LinearLayout>
 
     <!-- Zone défilante (entre le titre et les boutons) -->

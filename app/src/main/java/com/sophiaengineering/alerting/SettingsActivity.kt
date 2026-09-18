@@ -25,6 +25,9 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var store: SettingsStore
     private val countries by lazy { Countries.all() }
 
+    /** Édition déverrouillée ? Faux au démarrage (lecture seule, anti-clic accidentel). */
+    private var editingUnlocked = false
+
     private val notifPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { /* no-op */ }
 
@@ -47,9 +50,26 @@ class SettingsActivity : AppCompatActivity() {
         setupCountrySpinners()
         loadIntoUi(store.load())
         attachListeners()
+        applyLockState()
 
         maybeRequestNotificationPermission()
         checkForUpdate()
+    }
+
+    /** Applique l'état verrouillé/déverrouillé aux champs de saisie et à l'icône. */
+    private fun applyLockState() {
+        val editable = editingUnlocked
+        listOf(
+            binding.senderEmail, binding.appPassword, binding.recipients,
+            binding.smtpHost, binding.smtpPort,
+            binding.smsSwitch, binding.country1Spinner, binding.phone1Number,
+            binding.country2Spinner, binding.phone2Number,
+            binding.lowBatterySwitch, binding.lowBatteryThreshold
+        ).forEach { it.isEnabled = editable }
+
+        binding.lockButton.setImageResource(
+            if (editable) R.drawable.ic_lock_open else R.drawable.ic_lock
+        )
     }
 
     private fun setupCountrySpinners() {
@@ -61,6 +81,10 @@ class SettingsActivity : AppCompatActivity() {
         binding.testButton.setOnClickListener { onTestClicked() }
         binding.startButton.setOnClickListener { onStartClicked() }
         binding.stopButton.setOnClickListener { onStopClicked() }
+        binding.lockButton.setOnClickListener {
+            editingUnlocked = !editingUnlocked
+            applyLockState()
+        }
 
         binding.smsSwitch.setOnCheckedChangeListener { _, checked ->
             if (checked) {
