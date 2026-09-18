@@ -61,6 +61,23 @@ release APK**.
 3. Open the app, fill in the fields, tap **Start**.
 4. Accept the **notifications** permission prompt (Android 13+).
 
+### If Play Protect warns or blocks the install
+
+This is a self-signed, sideloaded app with no Google "reputation", so Play Protect
+may warn or block it. This is expected — there is no code trick to bypass it. To
+proceed (your own app, personal use):
+
+- **Force the install:** on the warning, tap **More details → Install anyway**
+  (or "Install without scanning").
+- **If it is hard-blocked:** temporarily turn off scanning — Play Store → profile
+  icon → **Play Protect** → ⚙️ (settings) → disable **"Scan apps with Play
+  Protect"**, install the APK, then turn it back on.
+- The app is signed with a **stable key**, so once you have accepted it, updates
+  signed with the same key are recognized as the same app.
+
+> For a zero-warning experience you would have to distribute via Google Play
+> (internal testing track), which needs a Play Console account.
+
 ## Updating the app
 
 The APK is signed with a **stable key** committed in the repo
