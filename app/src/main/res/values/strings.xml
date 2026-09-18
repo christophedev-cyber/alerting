@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Alerting</string>
+    <string name="intro">Alerte par email lorsque le téléphone n\'est plus alimenté par le secteur (220V). Utilisez un mot de passe d\'application Google (validation en 2 étapes requise).</string>
+
+    <string name="label_sender">Email d\'envoi (Gmail)</string>
+    <string name="hint_sender">exemple@gmail.com</string>
+
+    <string name="label_password">Mot de passe d\'application Google</string>
+    <string name="hint_password">16 caractères</string>
+
+    <string name="label_recipient">Email destinataire</string>
+    <string name="hint_recipient">destinataire@exemple.com</string>
+
+    <string name="label_frequency">Fréquence d\'envoi (minutes)</string>
+    <string name="hint_frequency">15</string>
+
+    <string name="label_smtp_host">Serveur SMTP</string>
+    <string name="label_smtp_port">Port SMTP</string>
+
+    <string name="action_start">Démarrer</string>
+    <string name="action_stop">Arrêter</string>
+</resources>
