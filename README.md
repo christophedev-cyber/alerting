@@ -142,6 +142,9 @@ Enable auto-start for **Alerting** (names vary by brand):
 - **Oppo / Realme (ColorOS):** Settings → Apps → Alerting → **Allow Auto Launch**.
 - **Samsung:** Settings → Battery → Background usage limits → make sure Alerting is
   **not** in "Sleeping/Deep sleeping apps"; set the app to **Unrestricted**.
+- **OnePlus (OxygenOS):** App info → Battery → **Allow background activity** +
+  **Auto-launch**; Battery → **Advanced optimization** → turn off *Sleep standby
+  optimization*; and **lock the app** in the Recent apps screen.
 - **Stock Android / Pixel:** no extra step beyond unrestricted battery.
 
 After granting auto-start, do one Start so the setting is saved; monitoring should
