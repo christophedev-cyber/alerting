@@ -11,13 +11,26 @@ android {
         applicationId = "com.sophiaengineering.alerting"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        // Surchargés par la CI : -PappVersionCode=<run> -PappVersionName=<tag>
+        versionCode = (project.findProperty("appVersionCode") as String?)?.toIntOrNull() ?: 1
+        versionName = (project.findProperty("appVersionName") as String?) ?: "1.0"
+    }
+
+    signingConfigs {
+        create("release") {
+            // Clé stable committée pour permettre les mises à jour en place
+            // (usage personnel — voir README « Mises à jour »).
+            storeFile = file("alerting-release.keystore")
+            storePassword = "alerting"
+            keyAlias = "alerting"
+            keyPassword = "alerting"
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

@@ -44,24 +44,51 @@ Google no longer allows SMTP sending with your normal account password.
 
 ## 2. Build the APK (cloud build, nothing to install)
 
-The project builds automatically via **GitHub Actions**.
+The project builds automatically via **GitHub Actions** and produces a **signed
+release APK**.
 
-1. Push the project to a GitHub repository:
-   ```bash
-   git remote add origin https://github.com/<you>/alerting.git
-   git push -u origin main
-   ```
-2. Open the repository's **Actions** tab. The "Build APK" workflow runs on every
-   push (and manually via "Run workflow").
-3. When it finishes, download the **`alerting-debug-apk`** artifact — it contains
-   `app-debug.apk`.
+- Every push to `main` builds the APK and uploads it as the **`alerting-apk`**
+  artifact (Actions tab → latest run → Artifacts).
+- Pushing a **`v*` git tag** additionally publishes a **GitHub Release** with the
+  APK attached (see *Releasing a new version* below) — this is the easiest place
+  to grab "the latest version".
 
 ## 3. Install on the phone
 
-1. Transfer `app-debug.apk` to the phone.
-2. Allow installation from unknown sources, then install the APK.
+1. Download the APK (`alerting-<version>.apk`) from the latest **Release**
+   (Releases page) or from the `alerting-apk` artifact.
+2. Transfer it to the phone, allow installation from unknown sources, install it.
 3. Open the app, fill in the fields, tap **Start**.
 4. Accept the **notifications** permission prompt (Android 13+).
+
+## Updating the app
+
+The APK is signed with a **stable key** committed in the repo
+(`app/alerting-release.keystore`) and each build gets an increasing `versionCode`.
+Because the signature is stable, a newer version **installs on top of the old one
+and keeps your settings** — no uninstall needed.
+
+To update:
+
+1. Download the newer `alerting-<version>.apk` from the latest **Release**.
+2. Install it over the existing app. Android recognizes it as an update.
+
+> Security note: the signing key lives in the (public) repo, which is fine for
+> personal sideloading — it only guarantees consistent signatures for your own
+> updates. For wider distribution, move the keystore and passwords into GitHub
+> **Secrets** and reference them from the workflow instead.
+
+## Releasing a new version
+
+```bash
+# after committing your changes on main
+git tag v1.2
+git push origin v1.2
+```
+
+Pushing the tag triggers the workflow, which builds the signed APK, sets
+`versionName` from the tag (`v1.2` → `1.2`) and `versionCode` from the run number,
+and publishes a GitHub Release with the APK attached.
 
 ## 4. Background reliability (IMPORTANT)
 

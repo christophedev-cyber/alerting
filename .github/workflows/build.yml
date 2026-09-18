@@ -2,7 +2,12 @@ name: Build APK
 
 on:
   push:
+    branches: [ main ]
+    tags: [ 'v*' ]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -22,15 +27,41 @@ jobs:
         with:
           gradle-version: '8.7'
 
+      - name: Determine version
+        id: ver
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            echo "name=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=0.0-dev.${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+          fi
+          echo "code=${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+
       - name: Run unit tests
-        run: gradle testDebugUnitTest --no-daemon
+        run: gradle testReleaseUnitTest --no-daemon
 
-      - name: Build debug APK
-        run: gradle assembleDebug --no-daemon
+      - name: Build signed release APK
+        run: >
+          gradle assembleRelease --no-daemon
+          -PappVersionCode=${{ steps.ver.outputs.code }}
+          -PappVersionName=${{ steps.ver.outputs.name }}
 
-      - name: Upload APK
+      - name: Rename APK
+        run: cp app/build/outputs/apk/release/app-release.apk alerting-${{ steps.ver.outputs.name }}.apk
+
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: alerting-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: alerting-apk
+          path: alerting-${{ steps.ver.outputs.name }}.apk
           if-no-files-found: error
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >
+          gh release create "${GITHUB_REF_NAME}"
+          "alerting-${{ steps.ver.outputs.name }}.apk"
+          --title "${GITHUB_REF_NAME}"
+          --generate-notes
