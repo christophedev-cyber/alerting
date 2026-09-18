@@ -23,11 +23,13 @@ Emails are sent through a Gmail account (SMTP) using a **Google app password**.
 - **Multiple recipients** (comma / semicolon / newline separated).
 - **Low-battery alert** with an on/off toggle and a configurable threshold —
   sent once when the battery crosses below the threshold, only while on battery.
-- **SMS alerts** (optional toggle): sends a text message (if a SIM is present) to a
-  configured number on the key events (power lost, power restored, low battery).
-  Country picker with flags and auto-filled dial code; the number is validated per
-  country (libphonenumber).
-- **"Test send now"** button to verify the settings immediately.
+- **SMS alerts** (optional toggle): sends a text message (if a SIM is present) to
+  **up to two numbers**, each with its own country/dial code, on the key events
+  (power lost, power restored, low battery). The country picker shows flags in the
+  list and collapses to just the dial code once selected; numbers are validated per
+  country (libphonenumber). Enabling the toggle requires a SIM (physical or eSIM).
+- **"Test send now"** button: sends a test email and, if SMS alerts are enabled, a
+  test SMS to each configured number.
 - Automatic restart of monitoring after a phone reboot.
 - Live status in the header: **Active** (green) / **Stopped** (red).
 - All parameters editable in the app (sender email, app password, recipients,

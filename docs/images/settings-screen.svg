@@ -1,79 +1,80 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="400" height="880" viewBox="0 0 400 880" font-family="Segoe UI, Roboto, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="770" viewBox="0 0 400 770" font-family="Segoe UI, Roboto, Arial, sans-serif">
   <defs>
-    <clipPath id="screen"><rect x="16" y="16" width="368" height="848" rx="28"/></clipPath>
+    <clipPath id="screen"><rect x="16" y="16" width="368" height="738" rx="28"/></clipPath>
   </defs>
 
-  <rect x="4" y="4" width="392" height="872" rx="36" fill="#111827"/>
-  <rect x="16" y="16" width="368" height="848" rx="28" fill="#fafafa"/>
+  <rect x="4" y="4" width="392" height="762" rx="36" fill="#111827"/>
+  <rect x="16" y="16" width="368" height="738" rx="28" fill="#fafafa"/>
 
   <g clip-path="url(#screen)">
-    <!-- Header: title + status badge -->
-    <rect x="16" y="16" width="368" height="60" fill="#37474f"/>
-    <text x="36" y="53" fill="#ffffff" font-size="20" font-weight="600">Alerting 1.5</text>
-    <text x="364" y="53" fill="#00E676" font-size="16" font-weight="700" text-anchor="end">Active</text>
+    <!-- Header -->
+    <rect x="16" y="16" width="368" height="56" fill="#37474f"/>
+    <text x="36" y="51" fill="#ffffff" font-size="19" font-weight="600">Alerting 1.7</text>
+    <text x="364" y="51" fill="#00E676" font-size="15" font-weight="700" text-anchor="end">Active</text>
 
-    <!-- Sender -->
-    <text x="36" y="104" fill="#263238" font-size="12" font-weight="600">Sender email (Gmail)</text>
-    <rect x="36" y="112" width="328" height="32" rx="6" fill="#ffffff" stroke="#b0bec5"/>
-    <text x="46" y="133" fill="#263238" font-size="13">home.alert@gmail.com</text>
+    <!-- ===== Email Alerts ===== -->
+    <text x="36" y="94" fill="#00796b" font-size="15" font-weight="700">Email Alerts</text>
 
-    <!-- Password -->
-    <text x="36" y="166" fill="#263238" font-size="12" font-weight="600">Google app password</text>
-    <rect x="36" y="174" width="328" height="32" rx="6" fill="#ffffff" stroke="#b0bec5"/>
-    <text x="46" y="195" fill="#607d8b" font-size="13">••••••••••••••••</text>
+    <text x="36" y="114" fill="#455a64" font-size="11">Sender email (Gmail)</text>
+    <rect x="36" y="120" width="328" height="26" rx="5" fill="#ffffff" stroke="#b0bec5"/>
+    <text x="44" y="138" fill="#263238" font-size="12">home.alert@gmail.com</text>
 
-    <!-- Recipients -->
-    <text x="36" y="228" fill="#263238" font-size="12" font-weight="600">Recipients (comma separated)</text>
-    <rect x="36" y="236" width="328" height="44" rx="6" fill="#ffffff" stroke="#b0bec5"/>
-    <text x="46" y="256" fill="#263238" font-size="13">dad@example.com,</text>
-    <text x="46" y="273" fill="#263238" font-size="13">mom@example.com</text>
+    <text x="36" y="164" fill="#455a64" font-size="11">Google app password</text>
+    <rect x="36" y="170" width="328" height="26" rx="5" fill="#ffffff" stroke="#b0bec5"/>
+    <text x="44" y="188" fill="#607d8b" font-size="12">••••••••••••••••</text>
 
-    <line x1="36" y1="298" x2="364" y2="298" stroke="#cfd8dc"/>
+    <text x="36" y="214" fill="#455a64" font-size="11">Recipients (comma separated)</text>
+    <rect x="36" y="220" width="328" height="38" rx="5" fill="#ffffff" stroke="#b0bec5"/>
+    <text x="44" y="238" fill="#263238" font-size="12">dad@example.com,</text>
+    <text x="44" y="252" fill="#263238" font-size="12">mom@example.com</text>
 
-    <!-- Low battery -->
-    <text x="36" y="322" fill="#263238" font-size="13" font-weight="600">Also alert on low battery</text>
-    <rect x="322" y="310" width="42" height="20" rx="10" fill="#c62828"/>
-    <circle cx="352" cy="320" r="11" fill="#ffffff"/>
-    <text x="36" y="352" fill="#263238" font-size="12" font-weight="600">Low-battery threshold (%)</text>
-    <rect x="36" y="360" width="328" height="32" rx="6" fill="#ffffff" stroke="#b0bec5"/>
-    <text x="46" y="381" fill="#263238" font-size="13">20</text>
+    <text x="36" y="276" fill="#455a64" font-size="11">SMTP server</text>
+    <rect x="36" y="282" width="328" height="26" rx="5" fill="#ffffff" stroke="#b0bec5"/>
+    <text x="44" y="300" fill="#263238" font-size="12">smtp.gmail.com</text>
 
-    <line x1="36" y1="410" x2="364" y2="410" stroke="#cfd8dc"/>
+    <text x="36" y="326" fill="#455a64" font-size="11">SMTP port</text>
+    <rect x="36" y="332" width="328" height="26" rx="5" fill="#ffffff" stroke="#b0bec5"/>
+    <text x="44" y="350" fill="#263238" font-size="12">587</text>
 
-    <!-- SMS -->
-    <text x="36" y="434" fill="#263238" font-size="13" font-weight="600">Also send SMS alerts</text>
-    <rect x="322" y="422" width="42" height="20" rx="10" fill="#2e7d32"/>
-    <circle cx="352" cy="432" r="11" fill="#ffffff"/>
+    <line x1="36" y1="372" x2="364" y2="372" stroke="#cfd8dc"/>
 
-    <text x="36" y="464" fill="#263238" font-size="12" font-weight="600">Country</text>
-    <rect x="36" y="472" width="328" height="34" rx="6" fill="#ffffff" stroke="#b0bec5"/>
-    <text x="46" y="494" fill="#263238" font-size="13">🇫🇷  France  (+33)</text>
-    <text x="352" y="494" fill="#607d8b" font-size="12" text-anchor="end">▾</text>
+    <!-- ===== SMS Alerts ===== -->
+    <text x="36" y="394" fill="#00796b" font-size="15" font-weight="700">SMS Alerts</text>
 
-    <text x="36" y="528" fill="#263238" font-size="12" font-weight="600">Phone number</text>
-    <text x="36" y="552" fill="#263238" font-size="14" font-weight="700">+33</text>
-    <rect x="70" y="536" width="294" height="32" rx="6" fill="#ffffff" stroke="#b0bec5"/>
-    <text x="80" y="557" fill="#263238" font-size="13">6 12 34 56 78</text>
+    <text x="36" y="416" fill="#263238" font-size="12" font-weight="600">Also send SMS alerts</text>
+    <rect x="322" y="406" width="42" height="18" rx="9" fill="#2e7d32"/>
+    <circle cx="352" cy="415" r="10" fill="#ffffff"/>
 
-    <line x1="36" y1="590" x2="364" y2="590" stroke="#cfd8dc"/>
+    <text x="36" y="438" fill="#455a64" font-size="11">Phone number 1</text>
+    <rect x="36" y="444" width="70" height="28" rx="5" fill="#ffffff" stroke="#b0bec5"/>
+    <text x="52" y="463" fill="#263238" font-size="13" font-weight="600">+33</text>
+    <text x="96" y="463" fill="#90a4ae" font-size="11">▾</text>
+    <rect x="114" y="444" width="250" height="28" rx="5" fill="#ffffff" stroke="#b0bec5"/>
+    <text x="122" y="463" fill="#263238" font-size="12">6 12 34 56 78</text>
 
-    <!-- SMTP -->
-    <text x="36" y="614" fill="#263238" font-size="12" font-weight="600">SMTP server</text>
-    <rect x="36" y="622" width="328" height="32" rx="6" fill="#ffffff" stroke="#b0bec5"/>
-    <text x="46" y="643" fill="#263238" font-size="13">smtp.gmail.com</text>
+    <text x="36" y="490" fill="#455a64" font-size="11">Phone number 2 (optional)</text>
+    <rect x="36" y="496" width="70" height="28" rx="5" fill="#ffffff" stroke="#b0bec5"/>
+    <text x="52" y="515" fill="#263238" font-size="13" font-weight="600">+32</text>
+    <text x="96" y="515" fill="#90a4ae" font-size="11">▾</text>
+    <rect x="114" y="496" width="250" height="28" rx="5" fill="#ffffff" stroke="#b0bec5"/>
+    <text x="122" y="515" fill="#263238" font-size="12">470 12 34 56</text>
 
-    <text x="36" y="676" fill="#263238" font-size="12" font-weight="600">SMTP port</text>
-    <rect x="36" y="684" width="328" height="32" rx="6" fill="#ffffff" stroke="#b0bec5"/>
-    <text x="46" y="705" fill="#263238" font-size="13">587</text>
+    <line x1="36" y1="540" x2="364" y2="540" stroke="#cfd8dc"/>
+
+    <!-- ===== Low battery ===== -->
+    <text x="36" y="562" fill="#00796b" font-size="15" font-weight="700">Low battery</text>
+    <text x="36" y="584" fill="#263238" font-size="12" font-weight="600">Also alert on low battery</text>
+    <rect x="322" y="574" width="42" height="18" rx="9" fill="#c62828"/>
+    <circle cx="332" cy="583" r="10" fill="#ffffff"/>
 
     <!-- Fixed bottom bar -->
-    <line x1="16" y1="742" x2="384" y2="742" stroke="#cfd8dc"/>
-    <rect x="36" y="754" width="328" height="38" rx="6" fill="#eceff1" stroke="#90a4ae"/>
-    <text x="200" y="778" fill="#37474f" font-size="14" font-weight="600" text-anchor="middle">TEST SEND NOW</text>
+    <line x1="16" y1="622" x2="384" y2="622" stroke="#cfd8dc"/>
+    <rect x="36" y="632" width="328" height="34" rx="6" fill="#eceff1" stroke="#90a4ae"/>
+    <text x="200" y="654" fill="#37474f" font-size="13" font-weight="600" text-anchor="middle">TEST SEND NOW</text>
 
-    <rect x="36" y="800" width="158" height="40" rx="6" fill="#2e7d32"/>
-    <text x="115" y="825" fill="#ffffff" font-size="14" font-weight="700" text-anchor="middle">START</text>
-    <rect x="206" y="800" width="158" height="40" rx="6" fill="#c62828"/>
-    <text x="285" y="825" fill="#ffffff" font-size="14" font-weight="700" text-anchor="middle">STOP</text>
+    <rect x="36" y="674" width="158" height="38" rx="6" fill="#2e7d32"/>
+    <text x="115" y="698" fill="#ffffff" font-size="14" font-weight="700" text-anchor="middle">START</text>
+    <rect x="206" y="674" width="158" height="38" rx="6" fill="#c62828"/>
+    <text x="285" y="698" fill="#ffffff" font-size="14" font-weight="700" text-anchor="middle">STOP</text>
   </g>
 </svg>

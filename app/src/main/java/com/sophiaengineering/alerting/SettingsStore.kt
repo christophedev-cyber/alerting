@@ -34,8 +34,10 @@ class SettingsStore(context: Context) {
         lowBatteryAlertEnabled = prefs.getBoolean(KEY_LOW_BAT_ENABLED, false),
         lowBatteryThreshold = prefs.getInt(KEY_LOW_BAT_THRESHOLD, DEFAULT_THRESHOLD),
         smsAlertEnabled = prefs.getBoolean(KEY_SMS_ENABLED, false),
-        phoneCountryIso = prefs.getString(KEY_PHONE_ISO, DEFAULT_COUNTRY_ISO).orEmpty().ifBlank { DEFAULT_COUNTRY_ISO },
-        phoneNumber = prefs.getString(KEY_PHONE_NUMBER, "").orEmpty(),
+        phone1CountryIso = prefs.getString(KEY_PHONE1_ISO, DEFAULT_COUNTRY_ISO).orEmpty().ifBlank { DEFAULT_COUNTRY_ISO },
+        phone1Number = prefs.getString(KEY_PHONE1_NUMBER, "").orEmpty(),
+        phone2CountryIso = prefs.getString(KEY_PHONE2_ISO, DEFAULT_COUNTRY_ISO).orEmpty().ifBlank { DEFAULT_COUNTRY_ISO },
+        phone2Number = prefs.getString(KEY_PHONE2_NUMBER, "").orEmpty(),
         monitoringEnabled = prefs.getBoolean(KEY_ENABLED, false)
     )
 
@@ -49,8 +51,10 @@ class SettingsStore(context: Context) {
             .putBoolean(KEY_LOW_BAT_ENABLED, settings.lowBatteryAlertEnabled)
             .putInt(KEY_LOW_BAT_THRESHOLD, settings.lowBatteryThreshold)
             .putBoolean(KEY_SMS_ENABLED, settings.smsAlertEnabled)
-            .putString(KEY_PHONE_ISO, settings.phoneCountryIso.trim())
-            .putString(KEY_PHONE_NUMBER, settings.phoneNumber.trim())
+            .putString(KEY_PHONE1_ISO, settings.phone1CountryIso.trim())
+            .putString(KEY_PHONE1_NUMBER, settings.phone1Number.trim())
+            .putString(KEY_PHONE2_ISO, settings.phone2CountryIso.trim())
+            .putString(KEY_PHONE2_NUMBER, settings.phone2Number.trim())
             .putBoolean(KEY_ENABLED, settings.monitoringEnabled)
             .apply()
     }
@@ -69,8 +73,10 @@ class SettingsStore(context: Context) {
         private const val KEY_LOW_BAT_ENABLED = "low_battery_enabled"
         private const val KEY_LOW_BAT_THRESHOLD = "low_battery_threshold"
         private const val KEY_SMS_ENABLED = "sms_enabled"
-        private const val KEY_PHONE_ISO = "phone_country_iso"
-        private const val KEY_PHONE_NUMBER = "phone_number"
+        private const val KEY_PHONE1_ISO = "phone1_country_iso"
+        private const val KEY_PHONE1_NUMBER = "phone1_number"
+        private const val KEY_PHONE2_ISO = "phone2_country_iso"
+        private const val KEY_PHONE2_NUMBER = "phone2_number"
         private const val KEY_ENABLED = "monitoring_enabled"
 
         const val DEFAULT_HOST = "smtp.gmail.com"

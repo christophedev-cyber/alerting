@@ -172,11 +172,6 @@ class MonitoringService : Service() {
         val settings = settingsStore.load()
         if (!settings.smsAlertEnabled) return
 
-        val destination = PhoneValidator.toE164(settings.phoneCountryIso, settings.phoneNumber)
-        if (destination == null) {
-            updateNotification("SMS not sent: invalid phone number")
-            return
-        }
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
             != PackageManager.PERMISSION_GRANTED
         ) {
@@ -188,11 +183,19 @@ class MonitoringService : Service() {
             updateNotification("SMS not sent: no SIM card")
             return
         }
+        val destinations = settings.phoneEntries()
+            .mapNotNull { (iso, number) -> PhoneValidator.toE164(iso, number) }
+        if (destinations.isEmpty()) {
+            updateNotification("SMS not sent: invalid phone number")
+            return
+        }
         serviceScope.launch(Dispatchers.IO) {
-            try {
-                SmsSender.send(this@MonitoringService, destination, text)
-            } catch (e: Exception) {
-                updateNotification("SMS failed: ${e.message ?: "unknown error"}")
+            destinations.forEach { destination ->
+                try {
+                    SmsSender.send(this@MonitoringService, destination, text)
+                } catch (e: Exception) {
+                    updateNotification("SMS failed: ${e.message ?: "unknown error"}")
+                }
             }
         }
     }

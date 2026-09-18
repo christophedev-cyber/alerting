@@ -16,8 +16,10 @@ class AlertSettingsTest {
         lowBatteryAlertEnabled = false,
         lowBatteryThreshold = 20,
         smsAlertEnabled = false,
-        phoneCountryIso = "FR",
-        phoneNumber = "",
+        phone1CountryIso = "FR",
+        phone1Number = "",
+        phone2CountryIso = "FR",
+        phone2Number = "",
         monitoringEnabled = true
     )
 
@@ -95,20 +97,38 @@ class AlertSettingsTest {
     // --- Alerte SMS ----------------------------------------------------
 
     @Test
-    fun `sms active sans numero est rejete`() {
-        assertFalse(valid().copy(smsAlertEnabled = true, phoneNumber = "  ").isValid())
+    fun `sms active sans aucun numero est rejete`() {
+        assertFalse(valid().copy(smsAlertEnabled = true, phone1Number = "  ", phone2Number = "").isValid())
     }
 
     @Test
-    fun `sms active avec numero renseigne passe la validation de base`() {
+    fun `sms active avec un numero renseigne passe la validation de base`() {
         // La validation de format (libphonenumber) est faite au niveau UI ;
-        // ici on vérifie seulement la règle "numéro non vide".
-        assertTrue(valid().copy(smsAlertEnabled = true, phoneNumber = "612345678").isValid())
+        // ici on vérifie seulement la règle "au moins un numéro non vide".
+        assertTrue(valid().copy(smsAlertEnabled = true, phone1Number = "612345678").isValid())
     }
 
     @Test
-    fun `sms desactive ignore le numero`() {
-        assertTrue(valid().copy(smsAlertEnabled = false, phoneNumber = "").isValid())
+    fun `sms desactive ignore les numeros`() {
+        assertTrue(valid().copy(smsAlertEnabled = false, phone1Number = "", phone2Number = "").isValid())
+    }
+
+    @Test
+    fun `phoneEntries ne garde que les numeros non vides`() {
+        val s = valid().copy(
+            phone1CountryIso = "FR", phone1Number = "612345678",
+            phone2CountryIso = "BE", phone2Number = "  "
+        )
+        assertEquals(listOf("FR" to "612345678"), s.phoneEntries())
+    }
+
+    @Test
+    fun `phoneEntries garde les deux numeros`() {
+        val s = valid().copy(
+            phone1CountryIso = "FR", phone1Number = "612345678",
+            phone2CountryIso = "BE", phone2Number = "470123456"
+        )
+        assertEquals(listOf("FR" to "612345678", "BE" to "470123456"), s.phoneEntries())
     }
 
     // --- Validation email ----------------------------------------------

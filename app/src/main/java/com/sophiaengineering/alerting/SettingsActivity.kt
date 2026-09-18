@@ -9,8 +9,6 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.telephony.TelephonyManager
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -46,7 +44,7 @@ class SettingsActivity : AppCompatActivity() {
         binding.titleText.text = "${getString(R.string.app_name)} ${BuildConfig.VERSION_NAME}"
 
         store = SettingsStore(this)
-        setupCountrySpinner()
+        setupCountrySpinners()
         loadIntoUi(store.load())
         attachListeners()
 
@@ -54,28 +52,15 @@ class SettingsActivity : AppCompatActivity() {
         checkForUpdate()
     }
 
-    private fun setupCountrySpinner() {
-        val adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_item,
-            countries.map { it.display() }
-        )
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.countrySpinner.adapter = adapter
+    private fun setupCountrySpinners() {
+        binding.country1Spinner.adapter = CountryAdapter(this, countries)
+        binding.country2Spinner.adapter = CountryAdapter(this, countries)
     }
 
     private fun attachListeners() {
         binding.testButton.setOnClickListener { onTestClicked() }
         binding.startButton.setOnClickListener { onStartClicked() }
         binding.stopButton.setOnClickListener { onStopClicked() }
-
-        binding.countrySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
-                binding.dialCodeText.text = "+${countries[position].dialCode}"
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
 
         binding.smsSwitch.setOnCheckedChangeListener { _, checked ->
             if (checked) {
@@ -91,37 +76,22 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    /** Vrai si une carte SIM (physique ou eSIM active) est présente. */
-    private fun hasSimCard(): Boolean {
-        val tm = getSystemService(TelephonyManager::class.java) ?: return false
-        return when (tm.simState) {
-            TelephonyManager.SIM_STATE_ABSENT,
-            TelephonyManager.SIM_STATE_UNKNOWN -> false
-            else -> true
-        }
-    }
-
-    private fun showNoSimDialog() {
-        AlertDialog.Builder(this)
-            .setTitle(R.string.sim_required_title)
-            .setMessage(R.string.sim_required_message)
-            .setPositiveButton(android.R.string.ok, null)
-            .show()
-    }
-
     private fun loadIntoUi(s: AlertSettings) {
         binding.senderEmail.setText(s.senderEmail)
         binding.appPassword.setText(s.appPassword)
         binding.recipients.setText(s.recipients)
-        binding.lowBatterySwitch.isChecked = s.lowBatteryAlertEnabled
-        binding.lowBatteryThreshold.setText(s.lowBatteryThreshold.toString())
-        binding.smsSwitch.isChecked = s.smsAlertEnabled
-        val pos = Countries.indexOfIso(countries, s.phoneCountryIso)
-        binding.countrySpinner.setSelection(pos)
-        binding.dialCodeText.text = "+${countries[pos].dialCode}"
-        binding.phoneNumber.setText(s.phoneNumber)
         binding.smtpHost.setText(s.smtpHost)
         binding.smtpPort.setText(s.smtpPort.toString())
+
+        binding.smsSwitch.isChecked = s.smsAlertEnabled
+        binding.country1Spinner.setSelection(Countries.indexOfIso(countries, s.phone1CountryIso))
+        binding.phone1Number.setText(s.phone1Number)
+        binding.country2Spinner.setSelection(Countries.indexOfIso(countries, s.phone2CountryIso))
+        binding.phone2Number.setText(s.phone2Number)
+
+        binding.lowBatterySwitch.isChecked = s.lowBatteryAlertEnabled
+        binding.lowBatteryThreshold.setText(s.lowBatteryThreshold.toString())
+
         updateStatusBadge(s.monitoringEnabled)
     }
 
@@ -136,7 +106,8 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun readFromUi(): AlertSettings {
-        val country = countries[binding.countrySpinner.selectedItemPosition]
+        val c1 = countries[binding.country1Spinner.selectedItemPosition]
+        val c2 = countries[binding.country2Spinner.selectedItemPosition]
         return AlertSettings(
             senderEmail = binding.senderEmail.text.toString(),
             appPassword = binding.appPassword.text.toString(),
@@ -146,19 +117,23 @@ class SettingsActivity : AppCompatActivity() {
             lowBatteryAlertEnabled = binding.lowBatterySwitch.isChecked,
             lowBatteryThreshold = binding.lowBatteryThreshold.text.toString().toIntOrNull() ?: 0,
             smsAlertEnabled = binding.smsSwitch.isChecked,
-            phoneCountryIso = country.iso,
-            phoneNumber = binding.phoneNumber.text.toString(),
+            phone1CountryIso = c1.iso,
+            phone1Number = binding.phone1Number.text.toString(),
+            phone2CountryIso = c2.iso,
+            phone2Number = binding.phone2Number.text.toString(),
             monitoringEnabled = true
         )
     }
 
-    /** Validation des réglages + du numéro selon le pays (via libphonenumber). */
+    /** Validation des réglages + du/des numéro(s) selon le pays (via libphonenumber). */
     private fun validate(settings: AlertSettings): List<String> {
         val errors = settings.validationErrors().toMutableList()
-        if (settings.smsAlertEnabled && settings.phoneNumber.isNotBlank() &&
-            !PhoneValidator.isValid(settings.phoneCountryIso, settings.phoneNumber)
-        ) {
-            errors.add("Invalid phone number for the selected country")
+        if (settings.smsAlertEnabled) {
+            settings.phoneEntries().forEach { (iso, number) ->
+                if (!PhoneValidator.isValid(iso, number)) {
+                    errors.add("Invalid phone number: +${PhoneValidator.dialCode(iso)} $number")
+                }
+            }
         }
         return errors
     }
@@ -186,7 +161,7 @@ class SettingsActivity : AppCompatActivity() {
         binding.statusText.text = ""
     }
 
-    /** Envoie un email de test avec les valeurs actuellement saisies. */
+    /** Envoie un email de test et, si l'option SMS est active, un SMS de test. */
     private fun onTestClicked() {
         val settings = readFromUi()
         val errors = validate(settings)
@@ -197,27 +172,52 @@ class SettingsActivity : AppCompatActivity() {
         binding.testButton.isEnabled = false
         binding.statusText.text = "Sending test…"
         lifecycleScope.launch {
-            val error = withContext(Dispatchers.IO) {
-                try {
-                    SmtpEmailSender().send(
-                        settings,
-                        EmailMessage(
-                            subject = "[TEST] Alerting",
-                            body = "This is a test email sent from the Alerting app."
-                        )
-                    )
-                    null
-                } catch (e: Exception) {
-                    e.message ?: "unknown error"
+            val result = withContext(Dispatchers.IO) { runTest(settings) }
+            binding.testButton.isEnabled = true
+            binding.statusText.text = result
+        }
+    }
+
+    private fun runTest(settings: AlertSettings): String {
+        val report = StringBuilder()
+
+        try {
+            SmtpEmailSender().send(
+                settings,
+                EmailMessage(
+                    subject = "[TEST] Alerting",
+                    body = "This is a test email sent from the Alerting app."
+                )
+            )
+            report.append("Email sent ✓")
+        } catch (e: Exception) {
+            report.append("Email failed: ${e.message ?: "unknown error"}")
+        }
+
+        if (settings.smsAlertEnabled) {
+            val destinations = settings.phoneEntries()
+                .mapNotNull { (iso, number) -> PhoneValidator.toE164(iso, number) }
+            when {
+                !hasSmsPermission() -> report.append("\nSMS skipped: permission missing")
+                !hasSimCard() -> report.append("\nSMS skipped: no SIM card")
+                destinations.isEmpty() -> report.append("\nSMS skipped: no valid number")
+                else -> {
+                    var ok = 0
+                    var failed = 0
+                    destinations.forEach { dest ->
+                        try {
+                            SmsSender.send(this, dest, "[TEST] Alerting SMS")
+                            ok++
+                        } catch (_: Exception) {
+                            failed++
+                        }
+                    }
+                    report.append("\nSMS sent to $ok number(s)")
+                    if (failed > 0) report.append(", $failed failed")
                 }
             }
-            binding.testButton.isEnabled = true
-            binding.statusText.text = if (error == null) {
-                "Test sent successfully ✓"
-            } else {
-                "Test failed: $error"
-            }
         }
+        return report.toString()
     }
 
     private fun showErrors(errors: List<String>) {
@@ -227,6 +227,24 @@ class SettingsActivity : AppCompatActivity() {
     private fun hasSmsPermission(): Boolean =
         ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) ==
             PackageManager.PERMISSION_GRANTED
+
+    /** Vrai si une carte SIM (physique ou eSIM active) est présente. */
+    private fun hasSimCard(): Boolean {
+        val tm = getSystemService(TelephonyManager::class.java) ?: return false
+        return when (tm.simState) {
+            TelephonyManager.SIM_STATE_ABSENT,
+            TelephonyManager.SIM_STATE_UNKNOWN -> false
+            else -> true
+        }
+    }
+
+    private fun showNoSimDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.sim_required_title)
+            .setMessage(R.string.sim_required_message)
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
+    }
 
     private fun maybeRequestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
@@ -263,10 +281,6 @@ class SettingsActivity : AppCompatActivity() {
             .show()
     }
 
-    /**
-     * Télécharge l'APK et ouvre directement l'écran d'installation Android.
-     * Repli sur l'ouverture navigateur si l'APK n'est pas disponible.
-     */
     private fun downloadAndInstall(latest: ReleaseInfo) {
         val url = latest.apkUrl
         if (url == null) {

@@ -16,8 +16,10 @@ data class AlertSettings(
     val lowBatteryAlertEnabled: Boolean,
     val lowBatteryThreshold: Int,
     val smsAlertEnabled: Boolean,
-    val phoneCountryIso: String,
-    val phoneNumber: String,
+    val phone1CountryIso: String,
+    val phone1Number: String,
+    val phone2CountryIso: String,
+    val phone2Number: String,
     val monitoringEnabled: Boolean
 ) {
     /** Liste des destinataires normalisée (adresses non vides). */
@@ -25,6 +27,13 @@ data class AlertSettings(
         recipients.split(',', ';', '\n')
             .map { it.trim() }
             .filter { it.isNotEmpty() }
+
+    /** Numéros renseignés (paires ISO pays / numéro national), numéros vides exclus. */
+    fun phoneEntries(): List<Pair<String, String>> =
+        listOf(
+            phone1CountryIso to phone1Number.trim(),
+            phone2CountryIso to phone2Number.trim()
+        ).filter { it.second.isNotEmpty() }
 
     /** Liste des erreurs de validation (vide si les réglages sont valides). */
     fun validationErrors(): List<String> {
@@ -45,8 +54,8 @@ data class AlertSettings(
         if (lowBatteryAlertEnabled && lowBatteryThreshold !in 1..100) {
             errors.add("Battery threshold must be between 1 and 100%")
         }
-        if (smsAlertEnabled && phoneNumber.isBlank()) {
-            errors.add("SMS enabled but phone number is empty")
+        if (smsAlertEnabled && phoneEntries().isEmpty()) {
+            errors.add("SMS enabled but no phone number")
         }
         return errors
     }
