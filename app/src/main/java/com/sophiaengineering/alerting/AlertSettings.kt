@@ -11,7 +11,6 @@ data class AlertSettings(
     val senderEmail: String,
     val appPassword: String,
     val recipients: String,
-    val frequencyMinutes: Int,
     val smtpHost: String,
     val smtpPort: Int,
     val lowBatteryAlertEnabled: Boolean,
@@ -41,7 +40,6 @@ data class AlertSettings(
                 .forEach { errors.add("Invalid recipient: $it") }
         }
 
-        if (frequencyMinutes < 1) errors.add("Frequency must be at least 1 minute")
         if (smtpHost.isBlank()) errors.add("Missing SMTP server")
         if (smtpPort !in 1..65535) errors.add("Invalid SMTP port (1-65535)")
         if (lowBatteryAlertEnabled && lowBatteryThreshold !in 1..100) {

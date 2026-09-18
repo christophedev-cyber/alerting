@@ -11,7 +11,6 @@ class AlertSettingsTest {
         senderEmail = "envoi@gmail.com",
         appPassword = "abcd efgh ijkl mnop",
         recipients = "dest@exemple.com",
-        frequencyMinutes = 15,
         smtpHost = "smtp.gmail.com",
         smtpPort = 587,
         lowBatteryAlertEnabled = false,
@@ -36,11 +35,6 @@ class AlertSettingsTest {
     @Test
     fun `mot de passe vide est rejete`() {
         assertFalse(valid().copy(appPassword = "   ").isValid())
-    }
-
-    @Test
-    fun `frequence inferieure a 1 est rejetee`() {
-        assertFalse(valid().copy(frequencyMinutes = 0).isValid())
     }
 
     @Test

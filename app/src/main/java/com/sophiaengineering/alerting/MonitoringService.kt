@@ -11,15 +11,13 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.BatteryManager
 import android.os.IBinder
+import android.telephony.TelephonyManager
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
@@ -36,7 +34,6 @@ import java.util.Locale
 class MonitoringService : Service() {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    private var alertJob: Job? = null
 
     private lateinit var settingsStore: SettingsStore
     private lateinit var emailSender: EmailSender
@@ -102,7 +99,6 @@ class MonitoringService : Service() {
     }
 
     override fun onDestroy() {
-        stopBatteryAlertLoop()
         try {
             unregisterReceiver(powerReceiver)
         } catch (_: IllegalArgumentException) {
@@ -122,20 +118,20 @@ class MonitoringService : Service() {
     private fun handlePowerEvent(newState: PowerState) {
         when (stateMachine.onPowerEvent(newState)) {
             is AlertAction.StartBatteryAlerts -> {
-                startBatteryAlertLoop()
+                updateNotification("⚠ On battery — alert sent")
+                sendEmailAsync(buildBatteryMessage())
                 sendSmsIfEnabled(
                     "[ALERT] ${deviceName()} on battery (${batteryLevel()}%) at ${now()}"
                 )
             }
             is AlertAction.StopAndNotifyRestored -> {
-                stopBatteryAlertLoop()
                 sendEmailAsync(buildRestoredMessage())
                 sendSmsIfEnabled("[OK] ${deviceName()} mains power restored at ${now()}")
                 updateNotification("On mains power — monitoring active")
             }
             is AlertAction.None -> {
                 val label = if (stateMachine.state == PowerState.ON_BATTERY) {
-                    "⚠ On battery — alerts running"
+                    "⚠ On battery"
                 } else {
                     "On mains power — monitoring active"
                 }
@@ -167,23 +163,6 @@ class MonitoringService : Service() {
         }
     }
 
-    private fun startBatteryAlertLoop() {
-        stopBatteryAlertLoop()
-        updateNotification("⚠ On battery — sending alerts")
-        alertJob = serviceScope.launch {
-            val freqMinutes = settingsStore.load().frequencyMinutes.coerceAtLeast(1)
-            while (isActive) {
-                sendEmail(buildBatteryMessage())
-                delay(freqMinutes.toLong() * 60_000L)
-            }
-        }
-    }
-
-    private fun stopBatteryAlertLoop() {
-        alertJob?.cancel()
-        alertJob = null
-    }
-
     private fun sendEmailAsync(message: EmailMessage) {
         serviceScope.launch { sendEmail(message) }
     }
@@ -202,6 +181,11 @@ class MonitoringService : Service() {
             != PackageManager.PERMISSION_GRANTED
         ) {
             updateNotification("SMS not sent: SMS permission missing")
+            return
+        }
+        val telephony = getSystemService(TelephonyManager::class.java)
+        if (telephony == null || telephony.simState != TelephonyManager.SIM_STATE_READY) {
+            updateNotification("SMS not sent: no SIM card")
             return
         }
         serviceScope.launch(Dispatchers.IO) {
@@ -237,10 +221,6 @@ class MonitoringService : Service() {
             appendLine("Device     : ${deviceName()}")
             appendLine("Battery    : ${batteryLevel()}%")
             appendLine("Timestamp  : ${now()}")
-            appendLine()
-            appendLine("This email will be resent every " +
-                "${settingsStore.load().frequencyMinutes} minute(s) while the phone " +
-                "stays on battery.")
         }
     )
 

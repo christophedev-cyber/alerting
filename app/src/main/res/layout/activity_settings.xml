@@ -4,6 +4,35 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <!-- En-tête : titre + statut -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="?attr/colorPrimary"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp">
+
+        <TextView
+            android:id="@+id/titleText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:text="Alerting" />
+
+        <TextView
+            android:id="@+id/statusBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:text="Stopped" />
+    </LinearLayout>
+
     <!-- Zone défilante (entre le titre et les boutons) -->
     <ScrollView
         android:layout_width="match_parent"
@@ -65,19 +94,6 @@
                 android:inputType="textEmailAddress|textMultiLine"
                 android:minLines="2"
                 android:gravity="top" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="8dp"
-                android:text="@string/label_frequency" />
-
-            <EditText
-                android:id="@+id/frequency"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/hint_frequency"
-                android:inputType="number" />
 
             <View
                 android:layout_width="match_parent"
@@ -229,6 +245,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:backgroundTint="#2E7D32"
+                android:textColor="#FFFFFF"
                 android:text="@string/action_start" />
 
             <Button
@@ -236,6 +254,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:backgroundTint="#C62828"
+                android:textColor="#FFFFFF"
                 android:text="@string/action_stop" />
         </LinearLayout>
 

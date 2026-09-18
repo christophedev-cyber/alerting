@@ -3,6 +3,7 @@ package com.sophiaengineering.alerting
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -40,7 +41,8 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        title = "${getString(R.string.app_name)} ${BuildConfig.VERSION_NAME}"
+        supportActionBar?.hide()
+        binding.titleText.text = "${getString(R.string.app_name)} ${BuildConfig.VERSION_NAME}"
 
         store = SettingsStore(this)
         setupCountrySpinner()
@@ -85,7 +87,6 @@ class SettingsActivity : AppCompatActivity() {
         binding.senderEmail.setText(s.senderEmail)
         binding.appPassword.setText(s.appPassword)
         binding.recipients.setText(s.recipients)
-        binding.frequency.setText(s.frequencyMinutes.toString())
         binding.lowBatterySwitch.isChecked = s.lowBatteryAlertEnabled
         binding.lowBatteryThreshold.setText(s.lowBatteryThreshold.toString())
         binding.smsSwitch.isChecked = s.smsAlertEnabled
@@ -95,10 +96,16 @@ class SettingsActivity : AppCompatActivity() {
         binding.phoneNumber.setText(s.phoneNumber)
         binding.smtpHost.setText(s.smtpHost)
         binding.smtpPort.setText(s.smtpPort.toString())
-        binding.statusText.text = if (s.monitoringEnabled) {
-            "Status: monitoring active"
+        updateStatusBadge(s.monitoringEnabled)
+    }
+
+    private fun updateStatusBadge(active: Boolean) {
+        if (active) {
+            binding.statusBadge.text = "Active"
+            binding.statusBadge.setTextColor(Color.parseColor("#00E676"))
         } else {
-            "Status: stopped"
+            binding.statusBadge.text = "Stopped"
+            binding.statusBadge.setTextColor(Color.parseColor("#FF5252"))
         }
     }
 
@@ -108,7 +115,6 @@ class SettingsActivity : AppCompatActivity() {
             senderEmail = binding.senderEmail.text.toString(),
             appPassword = binding.appPassword.text.toString(),
             recipients = binding.recipients.text.toString(),
-            frequencyMinutes = binding.frequency.text.toString().toIntOrNull() ?: 0,
             smtpHost = binding.smtpHost.text.toString().ifBlank { SettingsStore.DEFAULT_HOST },
             smtpPort = binding.smtpPort.text.toString().toIntOrNull() ?: 0,
             lowBatteryAlertEnabled = binding.lowBatterySwitch.isChecked,
@@ -143,13 +149,15 @@ class SettingsActivity : AppCompatActivity() {
             this,
             Intent(this, MonitoringService::class.java)
         )
-        binding.statusText.text = "Status: monitoring active"
+        updateStatusBadge(true)
+        binding.statusText.text = ""
     }
 
     private fun onStopClicked() {
         store.setMonitoringEnabled(false)
         stopService(Intent(this, MonitoringService::class.java))
-        binding.statusText.text = "Status: stopped"
+        updateStatusBadge(false)
+        binding.statusText.text = ""
     }
 
     /** Envoie un email de test avec les valeurs actuellement saisies. */
