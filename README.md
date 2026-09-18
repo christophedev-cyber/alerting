@@ -128,6 +128,25 @@ services. To make sure alerts are sent:
 
 Without this, the system may kill the service and no emails will be sent.
 
+### After a reboot (auto-start)
+
+To resume monitoring automatically after the phone restarts, the app must be
+allowed to **auto-start**. On most custom skins this is **off by default**, so
+after a reboot nothing happens until you reopen the app and press Start again.
+
+Enable auto-start for **Alerting** (names vary by brand):
+
+- **Xiaomi / Redmi (MIUI):** Settings → Apps → Manage apps → Alerting → **Autostart** = on.
+- **Huawei:** Settings → Apps → Alerting → **App launch** → Manage manually → enable
+  *Auto-launch* + *Run in background*.
+- **Oppo / Realme (ColorOS):** Settings → Apps → Alerting → **Allow Auto Launch**.
+- **Samsung:** Settings → Battery → Background usage limits → make sure Alerting is
+  **not** in "Sleeping/Deep sleeping apps"; set the app to **Unrestricted**.
+- **Stock Android / Pixel:** no extra step beyond unrestricted battery.
+
+After granting auto-start, do one Start so the setting is saved; monitoring should
+then resume on its own after each reboot.
+
 ## 5. How it works
 
 | Event | Action |
