@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -28,6 +29,7 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        title = "${getString(R.string.app_name)} ${BuildConfig.VERSION_NAME}"
 
         store = SettingsStore(this)
         loadIntoUi(store.load())
@@ -61,11 +63,46 @@ class SettingsActivity : AppCompatActivity() {
                     BuildConfig.VERSION_NAME
                 )
             )
-            .setPositiveButton(R.string.update_download) { _, _ ->
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(target)))
-            }
+            .setPositiveButton(R.string.update_download) { _, _ -> downloadAndInstall(latest) }
             .setNegativeButton(R.string.update_later, null)
             .show()
+    }
+
+    /**
+     * Télécharge l'APK et ouvre directement l'écran d'installation Android.
+     * Repli sur l'ouverture navigateur si l'APK n'est pas disponible.
+     */
+    private fun downloadAndInstall(latest: ReleaseInfo) {
+        val url = latest.apkUrl
+        if (url == null) {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(latest.pageUrl)))
+            return
+        }
+        // Android 8+ : autorisation "installer des applis inconnues" requise.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+            !packageManager.canRequestPackageInstalls()
+        ) {
+            binding.statusText.text = "Allow installing unknown apps, then tap Download again"
+            startActivity(
+                Intent(
+                    Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                    Uri.parse("package:$packageName")
+                )
+            )
+            return
+        }
+        binding.statusText.text = "Downloading update…"
+        lifecycleScope.launch {
+            val file = withContext(Dispatchers.IO) {
+                ApkInstaller.download(this@SettingsActivity, url)
+            }
+            if (file == null) {
+                binding.statusText.text = "Download failed"
+                return@launch
+            }
+            binding.statusText.text = "Installing update…"
+            startActivity(ApkInstaller.installIntent(this@SettingsActivity, file))
+        }
     }
 
     private fun loadIntoUi(s: AlertSettings) {
