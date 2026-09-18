@@ -66,7 +66,7 @@ class MonitoringService : Service() {
         emailSender = SmtpEmailSender()
 
         createNotificationChannel()
-        startForeground(NOTIF_ID, buildNotification("Surveillance active"))
+        startForeground(NOTIF_ID, buildNotification("Monitoring active"))
 
         powerReceiver = PowerConnectionReceiver { newState -> handlePowerEvent(newState) }
         val filter = IntentFilter().apply {
@@ -123,13 +123,13 @@ class MonitoringService : Service() {
             is AlertAction.StopAndNotifyRestored -> {
                 stopBatteryAlertLoop()
                 sendEmailAsync(buildRestoredMessage())
-                updateNotification("Sur secteur — surveillance active")
+                updateNotification("On mains power — monitoring active")
             }
             is AlertAction.None -> {
                 val label = if (stateMachine.state == PowerState.ON_BATTERY) {
-                    "⚠ Sur batterie — alertes en cours"
+                    "⚠ On battery — alerts running"
                 } else {
-                    "Sur secteur — surveillance active"
+                    "On mains power — monitoring active"
                 }
                 updateNotification(label)
             }
@@ -160,7 +160,7 @@ class MonitoringService : Service() {
 
     private fun startBatteryAlertLoop() {
         stopBatteryAlertLoop()
-        updateNotification("⚠ Sur batterie — envoi des alertes")
+        updateNotification("⚠ On battery — sending alerts")
         alertJob = serviceScope.launch {
             val freqMinutes = settingsStore.load().frequencyMinutes.coerceAtLeast(1)
             while (isActive) {
@@ -182,53 +182,53 @@ class MonitoringService : Service() {
     private suspend fun sendEmail(message: EmailMessage) {
         val settings = settingsStore.load()
         if (!settings.isValid()) {
-            updateNotification("Réglages invalides — envoi impossible")
+            updateNotification("Invalid settings — cannot send")
             return
         }
         try {
             withContext(Dispatchers.IO) { emailSender.send(settings, message) }
-            updateNotification("Dernier email envoyé à ${now()}")
+            updateNotification("Last email sent at ${now()}")
         } catch (e: Exception) {
-            updateNotification("Échec d'envoi : ${e.message ?: "erreur inconnue"}")
+            updateNotification("Send failed: ${e.message ?: "unknown error"}")
         }
     }
 
     // --- Contenu des emails ---------------------------------------------
 
     private fun buildBatteryMessage(): EmailMessage = EmailMessage(
-        subject = "[ALERTE] ${deviceName()} est sur batterie",
+        subject = "[ALERT] ${deviceName()} is on battery",
         body = buildString {
-            appendLine("Le téléphone n'est plus alimenté par le secteur (220V).")
+            appendLine("The phone is no longer powered from the mains (220V).")
             appendLine()
-            appendLine("Appareil     : ${deviceName()}")
-            appendLine("Batterie     : ${batteryLevel()}%")
-            appendLine("Horodatage   : ${now()}")
+            appendLine("Device     : ${deviceName()}")
+            appendLine("Battery    : ${batteryLevel()}%")
+            appendLine("Timestamp  : ${now()}")
             appendLine()
-            appendLine("Cet email sera renvoyé toutes les " +
-                "${settingsStore.load().frequencyMinutes} minute(s) tant que le " +
-                "téléphone reste sur batterie.")
+            appendLine("This email will be resent every " +
+                "${settingsStore.load().frequencyMinutes} minute(s) while the phone " +
+                "stays on battery.")
         }
     )
 
     private fun buildLowBatteryMessage(pct: Int): EmailMessage = EmailMessage(
-        subject = "[BATTERIE FAIBLE] ${deviceName()} — $pct%",
+        subject = "[LOW BATTERY] ${deviceName()} — $pct%",
         body = buildString {
-            appendLine("Le niveau de batterie est descendu sous le seuil configuré.")
+            appendLine("The battery level has dropped below the configured threshold.")
             appendLine()
-            appendLine("Appareil     : ${deviceName()}")
-            appendLine("Batterie     : $pct%")
-            appendLine("Horodatage   : ${now()}")
+            appendLine("Device     : ${deviceName()}")
+            appendLine("Battery    : $pct%")
+            appendLine("Timestamp  : ${now()}")
         }
     )
 
     private fun buildRestoredMessage(): EmailMessage = EmailMessage(
-        subject = "[OK] ${deviceName()} — secteur rétabli",
+        subject = "[OK] ${deviceName()} — mains power restored",
         body = buildString {
-            appendLine("Le téléphone est de nouveau alimenté par le secteur (220V).")
+            appendLine("The phone is powered from the mains (220V) again.")
             appendLine()
-            appendLine("Appareil     : ${deviceName()}")
-            appendLine("Batterie     : ${batteryLevel()}%")
-            appendLine("Horodatage   : ${now()}")
+            appendLine("Device     : ${deviceName()}")
+            appendLine("Battery    : ${batteryLevel()}%")
+            appendLine("Timestamp  : ${now()}")
         }
     )
 
@@ -254,10 +254,10 @@ class MonitoringService : Service() {
     private fun createNotificationChannel() {
         val channel = NotificationChannel(
             CHANNEL_ID,
-            "Surveillance alimentation",
+            "Power monitoring",
             NotificationManager.IMPORTANCE_LOW
         ).apply {
-            description = "Notification persistante du service de surveillance secteur"
+            description = "Persistent notification for the mains-power monitoring service"
         }
         val manager = getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(channel)

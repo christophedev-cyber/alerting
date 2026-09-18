@@ -27,22 +27,22 @@ data class AlertSettings(
     /** Liste des erreurs de validation (vide si les réglages sont valides). */
     fun validationErrors(): List<String> {
         val errors = mutableListOf<String>()
-        if (!isValidEmail(senderEmail)) errors.add("Email d'envoi invalide")
-        if (appPassword.isBlank()) errors.add("Mot de passe d'application manquant")
+        if (!isValidEmail(senderEmail)) errors.add("Invalid sender email")
+        if (appPassword.isBlank()) errors.add("Missing app password")
 
         val recips = recipientList()
         if (recips.isEmpty()) {
-            errors.add("Au moins un destinataire est requis")
+            errors.add("At least one recipient is required")
         } else {
             recips.filterNot { isValidEmail(it) }
-                .forEach { errors.add("Destinataire invalide : $it") }
+                .forEach { errors.add("Invalid recipient: $it") }
         }
 
-        if (frequencyMinutes < 1) errors.add("La fréquence doit être ≥ 1 minute")
-        if (smtpHost.isBlank()) errors.add("Serveur SMTP manquant")
-        if (smtpPort !in 1..65535) errors.add("Port SMTP invalide (1-65535)")
+        if (frequencyMinutes < 1) errors.add("Frequency must be at least 1 minute")
+        if (smtpHost.isBlank()) errors.add("Missing SMTP server")
+        if (smtpPort !in 1..65535) errors.add("Invalid SMTP port (1-65535)")
         if (lowBatteryAlertEnabled && lowBatteryThreshold !in 1..100) {
-            errors.add("Le seuil de batterie doit être entre 1 et 100 %")
+            errors.add("Battery threshold must be between 1 and 100%")
         }
         return errors
     }

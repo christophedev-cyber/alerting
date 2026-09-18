@@ -19,30 +19,30 @@
     <circle cx="52" cy="118" r="12" fill="#c62828"/>
     <text x="52" y="123" fill="#ffffff" font-size="14" font-weight="700" text-anchor="middle">⚡</text>
     <text x="74" y="114" fill="#263238" font-size="13" font-weight="700">Alerting</text>
-    <text x="74" y="134" fill="#c62828" font-size="13" font-weight="600">⚠ Sur batterie — envoi des alertes</text>
-    <text x="74" y="154" fill="#607d8b" font-size="11">Service de surveillance actif</text>
+    <text x="74" y="134" fill="#c62828" font-size="13" font-weight="600">⚠ On battery — sending alerts</text>
+    <text x="74" y="154" fill="#607d8b" font-size="11">Monitoring service active</text>
 
     <!-- Email preview 1 -->
-    <text x="36" y="204" fill="#455a64" font-size="13" font-weight="600">Email reçu par le destinataire</text>
+    <text x="36" y="204" fill="#455a64" font-size="13" font-weight="600">Email received by the recipient</text>
     <rect x="28" y="216" width="344" height="120" rx="12" fill="#ffffff" stroke="#cfd8dc"/>
-    <text x="44" y="242" fill="#b71c1c" font-size="14" font-weight="700">[ALERTE] Pixel 8 est sur batterie</text>
+    <text x="44" y="242" fill="#b71c1c" font-size="14" font-weight="700">[ALERT] Pixel 8 is on battery</text>
     <line x1="44" y1="254" x2="356" y2="254" stroke="#eceff1"/>
-    <text x="44" y="276" fill="#37474f" font-size="12">Le téléphone n'est plus alimenté par le secteur (220V).</text>
-    <text x="44" y="296" fill="#37474f" font-size="12">Appareil     : Google Pixel 8</text>
-    <text x="44" y="312" fill="#37474f" font-size="12">Batterie     : 62 %</text>
-    <text x="44" y="328" fill="#37474f" font-size="12">Horodatage   : 2026-09-18 21:14:07</text>
+    <text x="44" y="276" fill="#37474f" font-size="12">The phone is no longer powered from the mains (220V).</text>
+    <text x="44" y="296" fill="#37474f" font-size="12">Device     : Google Pixel 8</text>
+    <text x="44" y="312" fill="#37474f" font-size="12">Battery    : 62 %</text>
+    <text x="44" y="328" fill="#37474f" font-size="12">Timestamp  : 2026-09-18 21:14:07</text>
 
     <!-- Email preview 2 : restored -->
     <rect x="28" y="352" width="344" height="86" rx="12" fill="#ffffff" stroke="#cfd8dc"/>
-    <text x="44" y="378" fill="#1b5e20" font-size="14" font-weight="700">[OK] Pixel 8 — secteur rétabli</text>
+    <text x="44" y="378" fill="#1b5e20" font-size="14" font-weight="700">[OK] Pixel 8 — mains power restored</text>
     <line x1="44" y1="390" x2="356" y2="390" stroke="#eceff1"/>
-    <text x="44" y="412" fill="#37474f" font-size="12">Le téléphone est de nouveau alimenté par le secteur.</text>
-    <text x="44" y="430" fill="#37474f" font-size="12">Horodatage   : 2026-09-18 21:39:22</text>
+    <text x="44" y="412" fill="#37474f" font-size="12">The phone is powered from the mains again.</text>
+    <text x="44" y="430" fill="#37474f" font-size="12">Timestamp  : 2026-09-18 21:39:22</text>
 
     <!-- Email preview 3 : low battery -->
     <rect x="28" y="454" width="344" height="72" rx="12" fill="#ffffff" stroke="#cfd8dc"/>
-    <text x="44" y="480" fill="#e65100" font-size="14" font-weight="700">[BATTERIE FAIBLE] Pixel 8 — 20%</text>
+    <text x="44" y="480" fill="#e65100" font-size="14" font-weight="700">[LOW BATTERY] Pixel 8 — 20%</text>
     <line x1="44" y1="492" x2="356" y2="492" stroke="#eceff1"/>
-    <text x="44" y="514" fill="#37474f" font-size="12">Le niveau de batterie est passé sous le seuil configuré.</text>
+    <text x="44" y="514" fill="#37474f" font-size="12">The battery dropped below the configured threshold.</text>
   </g>
 </svg>

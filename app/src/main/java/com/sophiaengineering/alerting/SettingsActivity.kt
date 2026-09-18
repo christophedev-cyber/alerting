@@ -47,9 +47,9 @@ class SettingsActivity : AppCompatActivity() {
         binding.smtpHost.setText(s.smtpHost)
         binding.smtpPort.setText(s.smtpPort.toString())
         binding.statusText.text = if (s.monitoringEnabled) {
-            "Statut : surveillance active"
+            "Status: monitoring active"
         } else {
-            "Statut : arrêtée"
+            "Status: stopped"
         }
     }
 
@@ -77,13 +77,13 @@ class SettingsActivity : AppCompatActivity() {
             this,
             Intent(this, MonitoringService::class.java)
         )
-        binding.statusText.text = "Statut : surveillance active"
+        binding.statusText.text = "Status: monitoring active"
     }
 
     private fun onStopClicked() {
         store.setMonitoringEnabled(false)
         stopService(Intent(this, MonitoringService::class.java))
-        binding.statusText.text = "Statut : arrêtée"
+        binding.statusText.text = "Status: stopped"
     }
 
     /** Envoie un email de test avec les valeurs actuellement saisies. */
@@ -95,7 +95,7 @@ class SettingsActivity : AppCompatActivity() {
             return
         }
         binding.testButton.isEnabled = false
-        binding.statusText.text = "Envoi du test en cours…"
+        binding.statusText.text = "Sending test…"
         lifecycleScope.launch {
             val error = withContext(Dispatchers.IO) {
                 try {
@@ -103,25 +103,25 @@ class SettingsActivity : AppCompatActivity() {
                         settings,
                         EmailMessage(
                             subject = "[TEST] Alerting",
-                            body = "Ceci est un email de test envoyé depuis l'application Alerting."
+                            body = "This is a test email sent from the Alerting app."
                         )
                     )
                     null
                 } catch (e: Exception) {
-                    e.message ?: "erreur inconnue"
+                    e.message ?: "unknown error"
                 }
             }
             binding.testButton.isEnabled = true
             binding.statusText.text = if (error == null) {
-                "Test envoyé avec succès ✓"
+                "Test sent successfully ✓"
             } else {
-                "Échec du test : $error"
+                "Test failed: $error"
             }
         }
     }
 
     private fun showErrors(errors: List<String>) {
-        binding.statusText.text = "Erreurs :\n- " + errors.joinToString("\n- ")
+        binding.statusText.text = "Errors:\n- " + errors.joinToString("\n- ")
     }
 
     private fun maybeRequestNotificationPermission() {

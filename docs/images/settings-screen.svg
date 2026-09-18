@@ -13,63 +13,63 @@
     <text x="36" y="55" fill="#ffffff" font-size="20" font-weight="600">Alerting</text>
 
     <!-- Intro -->
-    <text x="36" y="104" fill="#455a64" font-size="12">Alerte email lorsque le téléphone n'est plus</text>
-    <text x="36" y="120" fill="#455a64" font-size="12">alimenté par le secteur (220V).</text>
+    <text x="36" y="104" fill="#455a64" font-size="12">Sends an email alert when the phone is no longer</text>
+    <text x="36" y="120" fill="#455a64" font-size="12">powered from the mains (220V).</text>
 
-    <!-- Field: Email d'envoi -->
-    <text x="36" y="152" fill="#263238" font-size="12" font-weight="600">Email d'envoi (Gmail)</text>
+    <!-- Field: Sender email -->
+    <text x="36" y="152" fill="#263238" font-size="12" font-weight="600">Sender email (Gmail)</text>
     <rect x="36" y="160" width="328" height="34" rx="6" fill="#ffffff" stroke="#b0bec5"/>
-    <text x="46" y="182" fill="#263238" font-size="13">alerte.maison@gmail.com</text>
+    <text x="46" y="182" fill="#263238" font-size="13">home.alert@gmail.com</text>
 
-    <!-- Field: Mot de passe -->
-    <text x="36" y="216" fill="#263238" font-size="12" font-weight="600">Mot de passe d'application Google</text>
+    <!-- Field: App password -->
+    <text x="36" y="216" fill="#263238" font-size="12" font-weight="600">Google app password</text>
     <rect x="36" y="224" width="328" height="34" rx="6" fill="#ffffff" stroke="#b0bec5"/>
     <text x="46" y="246" fill="#607d8b" font-size="13">••••••••••••••••</text>
 
-    <!-- Field: Destinataires -->
-    <text x="36" y="280" fill="#263238" font-size="12" font-weight="600">Destinataires (séparés par virgule)</text>
+    <!-- Field: Recipients -->
+    <text x="36" y="280" fill="#263238" font-size="12" font-weight="600">Recipients (comma separated)</text>
     <rect x="36" y="288" width="328" height="48" rx="6" fill="#ffffff" stroke="#b0bec5"/>
-    <text x="46" y="308" fill="#263238" font-size="13">papa@exemple.com,</text>
-    <text x="46" y="326" fill="#263238" font-size="13">maman@exemple.com</text>
+    <text x="46" y="308" fill="#263238" font-size="13">dad@example.com,</text>
+    <text x="46" y="326" fill="#263238" font-size="13">mom@example.com</text>
 
-    <!-- Field: Fréquence -->
-    <text x="36" y="358" fill="#263238" font-size="12" font-weight="600">Fréquence d'envoi (minutes)</text>
+    <!-- Field: Frequency -->
+    <text x="36" y="358" fill="#263238" font-size="12" font-weight="600">Send frequency (minutes)</text>
     <rect x="36" y="366" width="328" height="34" rx="6" fill="#ffffff" stroke="#b0bec5"/>
     <text x="46" y="388" fill="#263238" font-size="13">10</text>
 
     <line x1="36" y1="418" x2="364" y2="418" stroke="#cfd8dc"/>
 
-    <!-- Switch: batterie faible -->
-    <text x="36" y="446" fill="#263238" font-size="13" font-weight="600">Alerter aussi si batterie faible</text>
+    <!-- Switch: low battery -->
+    <text x="36" y="446" fill="#263238" font-size="13" font-weight="600">Also alert on low battery</text>
     <rect x="322" y="434" width="42" height="20" rx="10" fill="#c62828"/>
     <circle cx="352" cy="444" r="11" fill="#ffffff"/>
 
-    <text x="36" y="478" fill="#263238" font-size="12" font-weight="600">Seuil de batterie faible (%)</text>
+    <text x="36" y="478" fill="#263238" font-size="12" font-weight="600">Low-battery threshold (%)</text>
     <rect x="36" y="486" width="328" height="34" rx="6" fill="#ffffff" stroke="#b0bec5"/>
     <text x="46" y="508" fill="#263238" font-size="13">20</text>
 
     <line x1="36" y1="538" x2="364" y2="538" stroke="#cfd8dc"/>
 
     <!-- SMTP -->
-    <text x="36" y="566" fill="#263238" font-size="12" font-weight="600">Serveur SMTP</text>
+    <text x="36" y="566" fill="#263238" font-size="12" font-weight="600">SMTP server</text>
     <rect x="36" y="574" width="328" height="34" rx="6" fill="#ffffff" stroke="#b0bec5"/>
     <text x="46" y="596" fill="#263238" font-size="13">smtp.gmail.com</text>
 
-    <text x="36" y="630" fill="#263238" font-size="12" font-weight="600">Port SMTP</text>
+    <text x="36" y="630" fill="#263238" font-size="12" font-weight="600">SMTP port</text>
     <rect x="36" y="638" width="328" height="34" rx="6" fill="#ffffff" stroke="#b0bec5"/>
     <text x="46" y="660" fill="#263238" font-size="13">587</text>
 
     <!-- Test button -->
     <rect x="36" y="690" width="328" height="40" rx="6" fill="#eceff1" stroke="#90a4ae"/>
-    <text x="200" y="715" fill="#37474f" font-size="14" font-weight="600" text-anchor="middle">TESTER L'ENVOI MAINTENANT</text>
+    <text x="200" y="715" fill="#37474f" font-size="14" font-weight="600" text-anchor="middle">TEST SEND NOW</text>
 
     <!-- Start / Stop -->
     <rect x="36" y="740" width="158" height="40" rx="6" fill="#2e7d32"/>
-    <text x="115" y="765" fill="#ffffff" font-size="14" font-weight="600" text-anchor="middle">DÉMARRER</text>
+    <text x="115" y="765" fill="#ffffff" font-size="14" font-weight="600" text-anchor="middle">START</text>
     <rect x="206" y="740" width="158" height="40" rx="6" fill="#b0bec5"/>
-    <text x="285" y="765" fill="#263238" font-size="14" font-weight="600" text-anchor="middle">ARRÊTER</text>
+    <text x="285" y="765" fill="#263238" font-size="14" font-weight="600" text-anchor="middle">STOP</text>
 
     <!-- Status -->
-    <text x="36" y="806" fill="#1b5e20" font-size="13" font-weight="700">Statut : surveillance active</text>
+    <text x="36" y="806" fill="#1b5e20" font-size="13" font-weight="700">Status: monitoring active</text>
   </g>
 </svg>

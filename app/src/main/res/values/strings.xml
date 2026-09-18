@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Alerting</string>
-    <string name="intro">Alerte par email lorsque le téléphone n\'est plus alimenté par le secteur (220V). Utilisez un mot de passe d\'application Google (validation en 2 étapes requise).</string>
+    <string name="intro">Sends an email alert when the phone is no longer powered from the mains (220V). Use a Google app password (2-Step Verification required).</string>
 
-    <string name="label_sender">Email d\'envoi (Gmail)</string>
-    <string name="hint_sender">exemple@gmail.com</string>
+    <string name="label_sender">Sender email (Gmail)</string>
+    <string name="hint_sender">example@gmail.com</string>
 
-    <string name="label_password">Mot de passe d\'application Google</string>
-    <string name="hint_password">16 caractères</string>
+    <string name="label_password">Google app password</string>
+    <string name="hint_password">16 characters</string>
 
-    <string name="label_recipients">Destinataires (séparés par virgule)</string>
-    <string name="hint_recipients">a@exemple.com, b@exemple.com</string>
+    <string name="label_recipients">Recipients (comma separated)</string>
+    <string name="hint_recipients">a@example.com, b@example.com</string>
 
-    <string name="label_frequency">Fréquence d\'envoi (minutes)</string>
+    <string name="label_frequency">Send frequency (minutes)</string>
     <string name="hint_frequency">15</string>
 
-    <string name="label_low_battery_switch">Alerter aussi si batterie faible</string>
-    <string name="label_low_battery_threshold">Seuil de batterie faible (%)</string>
+    <string name="label_low_battery_switch">Also alert on low battery</string>
+    <string name="label_low_battery_threshold">Low-battery threshold (%)</string>
     <string name="hint_low_battery_threshold">20</string>
 
-    <string name="label_smtp_host">Serveur SMTP</string>
-    <string name="label_smtp_port">Port SMTP</string>
+    <string name="label_smtp_host">SMTP server</string>
+    <string name="label_smtp_port">SMTP port</string>
 
-    <string name="action_test">Tester l\'envoi maintenant</string>
-    <string name="action_start">Démarrer</string>
-    <string name="action_stop">Arrêter</string>
+    <string name="action_test">Test send now</string>
+    <string name="action_start">Start</string>
+    <string name="action_stop">Stop</string>
 </resources>
