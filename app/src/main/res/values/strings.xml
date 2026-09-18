@@ -25,4 +25,9 @@
     <string name="action_test">Test send now</string>
     <string name="action_start">Start</string>
     <string name="action_stop">Stop</string>
+
+    <string name="update_title">Update available</string>
+    <string name="update_message">Version %1$s is available.\nYou have %2$s.</string>
+    <string name="update_download">Download</string>
+    <string name="update_later">Later</string>
 </resources>

@@ -3,9 +3,11 @@ package com.sophiaengineering.alerting
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
@@ -35,6 +37,35 @@ class SettingsActivity : AppCompatActivity() {
         binding.stopButton.setOnClickListener { onStopClicked() }
 
         maybeRequestNotificationPermission()
+        checkForUpdate()
+    }
+
+    /** Propose la mise à jour si une Release plus récente est publiée sur GitHub. */
+    private fun checkForUpdate() {
+        lifecycleScope.launch {
+            val latest = withContext(Dispatchers.IO) { UpdateChecker.fetchLatest() } ?: return@launch
+            if (VersionCompare.isNewerVersion(latest.version, BuildConfig.VERSION_NAME)) {
+                showUpdateDialog(latest)
+            }
+        }
+    }
+
+    private fun showUpdateDialog(latest: ReleaseInfo) {
+        val target = latest.apkUrl ?: latest.pageUrl
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.update_title))
+            .setMessage(
+                getString(
+                    R.string.update_message,
+                    latest.version.removePrefix("v"),
+                    BuildConfig.VERSION_NAME
+                )
+            )
+            .setPositiveButton(R.string.update_download) { _, _ ->
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(target)))
+            }
+            .setNegativeButton(R.string.update_later, null)
+            .show()
     }
 
     private fun loadIntoUi(s: AlertSettings) {

@@ -68,9 +68,14 @@ The APK is signed with a **stable key** committed in the repo
 Because the signature is stable, a newer version **installs on top of the old one
 and keeps your settings** — no uninstall needed.
 
+The app also **checks for updates on launch**: if a newer GitHub Release exists, it
+shows an "Update available" dialog with a **Download** button that opens the APK
+download. (Silent if offline or no newer version.)
+
 To update:
 
-1. Download the newer `alerting-<version>.apk` from the latest **Release**.
+1. When the "Update available" dialog appears, tap **Download** (or grab the newer
+   `alerting-<version>.apk` from the latest **Release** manually).
 2. Install it over the existing app. Android recognizes it as an update.
 
 > Security note: the signing key lives in the (public) repo, which is fine for
