@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.telephony.TelephonyManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.activity.result.contract.ActivityResultContracts
@@ -77,10 +78,35 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.smsSwitch.setOnCheckedChangeListener { _, checked ->
-            if (checked && !hasSmsPermission()) {
-                smsPermissionLauncher.launch(Manifest.permission.SEND_SMS)
+            if (checked) {
+                if (!hasSimCard()) {
+                    binding.smsSwitch.isChecked = false
+                    showNoSimDialog()
+                    return@setOnCheckedChangeListener
+                }
+                if (!hasSmsPermission()) {
+                    smsPermissionLauncher.launch(Manifest.permission.SEND_SMS)
+                }
             }
         }
+    }
+
+    /** Vrai si une carte SIM (physique ou eSIM active) est présente. */
+    private fun hasSimCard(): Boolean {
+        val tm = getSystemService(TelephonyManager::class.java) ?: return false
+        return when (tm.simState) {
+            TelephonyManager.SIM_STATE_ABSENT,
+            TelephonyManager.SIM_STATE_UNKNOWN -> false
+            else -> true
+        }
+    }
+
+    private fun showNoSimDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.sim_required_title)
+            .setMessage(R.string.sim_required_message)
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
     }
 
     private fun loadIntoUi(s: AlertSettings) {

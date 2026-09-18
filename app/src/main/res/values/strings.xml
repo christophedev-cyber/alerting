@@ -28,6 +28,9 @@
     <string name="action_start">Start</string>
     <string name="action_stop">Stop</string>
 
+    <string name="sim_required_title">SIM card required</string>
+    <string name="sim_required_message">No SIM card detected. Please install a SIM card or activate an eSIM before enabling SMS alerts.</string>
+
     <string name="update_title">Update available</string>
     <string name="update_message">Version %1$s is available.\nYou have %2$s.</string>
     <string name="update_download">Download</string>
